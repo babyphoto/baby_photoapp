@@ -1,4 +1,4 @@
-package com.babyphoto;
+package kr.sherwher.babyphoto;
 
 import com.facebook.react.ReactActivity;
 

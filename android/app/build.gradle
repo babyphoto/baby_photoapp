@@ -81,7 +81,8 @@ project.ext.react = [
 ]
 
 apply from: "../../node_modules/react-native/react.gradle"
-
+apply from: "../../node_modules/react-native-code-push/android/codepush.gradle"
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 /**
  * Set this to true to create two separate APKs instead of one:
  *   - An APK that only works on ARM devices
@@ -128,11 +129,12 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.babyphoto"
+        applicationId "kr.sherwher.babyphoto"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     splits {
         abi {
@@ -162,6 +164,10 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+    dexOptions {
+        jumboMode true
+        javaMaxHeapSize "8g"
+    }
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -181,7 +187,12 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.facebook.react:react-native:+"  // From node_modules
-
+    implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'
+    implementation 'com.google.firebase:firebase-analytics:17.2.2'
+    implementation 'com.google.firebase:firebase-ads:19.0.0'
+    implementation "androidx.annotation:annotation:1.1.0"
+    implementation 'com.android.support:multidex:1.0.3'
     if (enableHermes) {
         def hermesPath = "../../node_modules/hermes-engine/android/";
         debugImplementation files(hermesPath + "hermes-debug.aar")

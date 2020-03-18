@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">babyphoto</string>
+    <string name="kakao_app_key">4aa7c5fa1d81b80468f1234e725a80db</string>
+    <string moduleConfig="true" name="CodePushDeploymentKey">sNdT_VCp_P6obFcW9tnKYD6z0rJZs7HroIU8j</string>
+    <string name="facebook_app_id">1139113923103136</string> 
+    <string name="fb_login_protocol_scheme">fb1139113923103136</string>
 </resources>
