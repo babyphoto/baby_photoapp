@@ -16,9 +16,8 @@ export const Size = {
   width: function(value) {
     return (value / designWidth) * viewWidth;
   },
-  tomorrow_item_width: function() {
-    return (viewWidth - 41) / 2;
-  },
+  navigationHeight:
+    (56 / designHeight) * (viewHeight - (viewWidth * 2 < viewHeight ? 62 : 0)),
   viewHeight: viewHeight,
   viewWidth: viewWidth,
 };

@@ -16,9 +16,10 @@
 
 import React, {useEffect} from 'react';
 import {StyleSheet} from 'react-native';
-import {Router, Scene, Modal, Overlay} from 'react-native-router-flux';
+import {Router, Scene, Modal, Overlay, Stack} from 'react-native-router-flux';
 import Main from './view/Main';
 import {Color} from './view/common/Color';
+import Login from './view/Login';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -34,7 +35,12 @@ export default class App extends React.Component {
       <Router onStateChange={this.stateHandler} sceneStyle={styles.scene}>
         <Overlay key="overlay">
           <Modal key="modal" hideNavBar>
-            <Scene key="main" title="main" initial component={Main} />
+            <Stack key="home_stack" hideNavBar>
+              <Scene key="main" title="main" component={Main} />
+            </Stack>
+            <Stack key="login_stack" initial hideNavBar>
+              <Scene key="login" title="login" initial component={Login} />
+            </Stack>
           </Modal>
         </Overlay>
       </Router>

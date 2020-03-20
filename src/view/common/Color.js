@@ -21,4 +21,5 @@ export const Color = {
   event_card: 'rgba(119,11,191,0.3)',
   modal: 'rgba(0,0,0,0.3)',
   tranparent: 'rgba(0,0,0,0.0)',
+  navtitle: 'rgba(0,0,0,0.87)',
 };

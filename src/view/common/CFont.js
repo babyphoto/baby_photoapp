@@ -1,10 +1,10 @@
 import {StyleSheet} from 'react-native';
 import {Size} from './Size';
 
-export const Font = StyleSheet.create({
+export const CFont = StyleSheet.create({
   title: {
     fontFamily: 'NotoSansKR-Bold',
-    fontSize: Size.width(28),
+    fontSize: Size.width(20),
     fontWeight: 'bold',
     fontStyle: 'normal',
     letterSpacing: -0.56,
