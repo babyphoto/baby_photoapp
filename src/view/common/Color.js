@@ -22,4 +22,7 @@ export const Color = {
   modal: 'rgba(0,0,0,0.3)',
   tranparent: 'rgba(0,0,0,0.0)',
   navtitle: 'rgba(0,0,0,0.87)',
+  floatingActionButton: 'rgba(231,76,60,1)',
+  c9b59b6: '#9b59b6',
+  groupItemSubTitleBack: 'rgba(0, 0, 0, 0.38)',
 };

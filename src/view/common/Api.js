@@ -8,10 +8,15 @@ export const API = {
   registUser: (data, res, err) => {
     APIdefault.POST('/user/regist', querySring.stringify(data), res, err);
   },
+  //group
+  groupList: (data, res, err) => {
+    APIdefault.GET('/group/groupList?' + querySring.stringify(data), res, err);
+  },
 };
 const APIdefault = {
   host: 'http://112.169.11.118:38080/api',
   GET: (addr, responsefunc, errfunc) => {
+    console.log('GET : ' + APIdefault.host + addr);
     fetch(APIdefault.host + addr, {
       method: 'GET',
     })
@@ -30,6 +35,7 @@ const APIdefault = {
       });
   },
   POST: (addr, param, responsefunc, errfunc) => {
+    console.log('POST : ' + APIdefault.host + addr, 'PARAM: ' + param);
     fetch(APIdefault.host + addr, {
       method: 'POST',
       headers: {
