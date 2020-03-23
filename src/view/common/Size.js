@@ -18,6 +18,7 @@ export const Size = {
   },
   navigationHeight:
     (56 / designHeight) * (viewHeight - (viewWidth * 2 < viewHeight ? 62 : 0)),
+  group_max_width: viewWidth / 2,
   viewHeight: viewHeight,
   viewWidth: viewWidth,
 };

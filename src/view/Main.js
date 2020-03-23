@@ -22,6 +22,7 @@ import {API} from './common/Api';
 import {CFont} from './common/CFont';
 import Grid from 'react-native-grid-component';
 import GroupItem from './component/grid/GroupItem';
+import {Actions} from 'react-native-router-flux';
 
 export default class Main extends React.Component {
   constructor(props) {
@@ -120,6 +121,15 @@ export default class Main extends React.Component {
     });
   };
 
+  onClickGroupItem = (param, title) => {
+    const {userInfo} = this.state;
+    Actions.fileList({
+      param: param,
+      title: title,
+      userInfo: userInfo,
+    });
+  };
+
   render() {
     const {
       createGroupPopup,
@@ -136,7 +146,7 @@ export default class Main extends React.Component {
           <StatusBar barStyle="dark-content" backgroundColor={Color.cffffff} />
         )}
         <View style={styles.content_frame}>
-          <CNavigation>메인</CNavigation>
+          <CNavigation isRight>메인</CNavigation>
           <View style={styles.list_frame}>
             <ScrollView style={styles.scroll_frame}>
               <View style={styles.title_frame}>
@@ -147,7 +157,12 @@ export default class Main extends React.Component {
               <Grid
                 scrollEnabled={false}
                 renderItem={(data, i) => {
-                  return <GroupItem groupInfo={data} />;
+                  return (
+                    <GroupItem
+                      groupInfo={data}
+                      onPress={this.onClickGroupItem}
+                    />
+                  );
                 }}
                 data={myGroupList}
                 numColumns={2}
@@ -161,7 +176,12 @@ export default class Main extends React.Component {
               <Grid
                 scrollEnabled={false}
                 renderItem={(data, i) => {
-                  return <View />;
+                  return (
+                    <GroupItem
+                      groupInfo={data}
+                      onPress={this.onClickGroupItem}
+                    />
+                  );
                 }}
                 data={invitedGroupList}
                 numColumns={2}

@@ -11,6 +11,7 @@ import PropTypes from 'prop-types';
 import {Size} from '../../common/Size';
 import {Color} from '../../common/Color';
 import {CFont} from '../../common/CFont';
+import {Actions} from 'react-native-router-flux';
 
 export default class CNavigation extends React.PureComponent {
   constructor(props) {
@@ -25,14 +26,20 @@ export default class CNavigation extends React.PureComponent {
     }
   };
 
+  onPressBackButton = () => {
+    Actions.pop();
+  };
+
   render() {
-    const {isBack, children} = this.props;
+    const {isBack, children, isRight, onRightButton} = this.props;
     return (
       <View style={[styles.container, styles.shadow]}>
         <View style={styles.margin}>
           {isBack ? (
             <View style={styles.back_button_frame}>
-              <TouchableOpacity style={styles.touchable}>
+              <TouchableOpacity
+                style={styles.touchable}
+                onPress={this.onPressBackButton}>
                 <Image
                   style={styles.back_button_image}
                   source={require('../../../assets/images/back_icon.png')}
@@ -47,14 +54,20 @@ export default class CNavigation extends React.PureComponent {
               {children}
             </Text>
           </View>
-          <View style={styles.button_frame}>
-            <TouchableOpacity style={styles.touchable}>
-              <Image
-                style={styles.back_button_image}
-                source={require('../../../assets/images/account.png')}
-              />
-            </TouchableOpacity>
-          </View>
+          {isRight ? (
+            <View style={styles.button_frame}>
+              <TouchableOpacity
+                style={styles.touchable}
+                onPress={onRightButton}>
+                <Image
+                  style={styles.back_button_image}
+                  source={require('../../../assets/images/account.png')}
+                />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View />
+          )}
         </View>
       </View>
     );

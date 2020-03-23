@@ -4,24 +4,18 @@ import PropTypes from 'prop-types';
 import {Size} from '../../common/Size';
 import {Color} from '../../common/Color';
 import {CFont} from '../../common/CFont';
+import {API} from '../../common/Api';
 
-export default class GroupItem extends React.PureComponent {
+export default class FileItem extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {};
   }
 
-  onPress = () => {
-    const {onPress, groupInfo} = this.props;
-    if (onPress) {
-      onPress(groupInfo, groupInfo.GroupName);
-    }
-  };
+  onPress = () => {};
 
   render() {
-    const {groupInfo} = this.props;
-    var isEmptyFile = groupInfo.GroupFileCount === 0;
-
+    const {fileInfo} = this.props;
     return (
       <View style={styles.container}>
         <View style={[styles.margin, styles.shadow]}>
@@ -29,57 +23,14 @@ export default class GroupItem extends React.PureComponent {
             disabled={false}
             style={styles.touchable}
             onPress={this.onPress}>
-            {isEmptyFile ? (
-              <View style={styles.empty_frame}>
-                <Image
-                  style={styles.empty_image}
-                  source={require('../../../assets/images/empty_image.png')}
-                />
-              </View>
-            ) : (
-              <View style={styles.photo_frame}>
-                <Image
-                  style={styles.photo}
-                  source={{
-                    uri:
-                      'https://k.kakaocdn.net/dn/dkqNJQ/btqCOzx45CQ/FfHGU432QWW7Qy7wudNHzK/img_640x640.jpg',
-                  }}
-                />
-              </View>
-            )}
-            <View style={styles.title_frame}>
-              <Text
-                style={[CFont.body2, {color: Color.cffffff}]}
-                numberOfLines={1}
-                lineBreakMode="tail">
-                {groupInfo.GroupName}
-              </Text>
-            </View>
-            <View style={styles.file_frame}>
-              <View style={styles.small_icon_frame}>
-                <Image
-                  style={styles.small_icon}
-                  source={require('../../../assets/images/face.png')}
-                />
-              </View>
-              <View style={styles.small_text_frame}>
-                <Text style={[CFont.subtext2, {color: Color.cffffff}]}>
-                  {groupInfo.GroupPeopleCount}
-                </Text>
-              </View>
-            </View>
-            <View style={styles.people_frame}>
-              <View style={styles.small_icon_frame}>
-                <Image
-                  style={styles.small_icon}
-                  source={require('../../../assets/images/photo.png')}
-                />
-              </View>
-              <View style={styles.small_text_frame}>
-                <Text style={[CFont.subtext2, {color: Color.cffffff}]}>
-                  {groupInfo.GroupFileCount}
-                </Text>
-              </View>
+            <View style={styles.photo_frame}>
+              <Image
+                style={styles.photo}
+                resizeMode="cover"
+                source={{
+                  uri: API.downloadURL + fileInfo.FilePath,
+                }}
+              />
             </View>
           </TouchableOpacity>
         </View>
@@ -88,7 +39,7 @@ export default class GroupItem extends React.PureComponent {
   }
 }
 
-GroupItem.propTypes = {
+FileItem.propTypes = {
   onPress: PropTypes.func,
 };
 
@@ -113,8 +64,7 @@ const styles = StyleSheet.create({
     margin: Size.width(10),
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: Color.ce2faf8,
-    borderRadius: Size.height(15),
+    backgroundColor: Color.c000000,
     overflow: 'hidden',
     position: 'relative',
   },

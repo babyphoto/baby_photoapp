@@ -12,6 +12,15 @@ export const API = {
   groupList: (data, res, err) => {
     APIdefault.GET('/group/groupList?' + querySring.stringify(data), res, err);
   },
+
+  //file
+  downloadURL: 'http://112.169.11.118:38080/api/files/download?path=',
+  fileList: (data, res, err) => {
+    APIdefault.GET('/files/fileList?' + querySring.stringify(data), res, err);
+  },
+  uploadFiles: (data, res, err) => {
+    APIdefault.filePost('/files/upload', data, res, err);
+  },
 };
 const APIdefault = {
   host: 'http://112.169.11.118:38080/api',
@@ -59,23 +68,21 @@ const APIdefault = {
       });
   },
   filePost: (addr, param, responsefunc, errfunc) => {
-    console.log('POST : ' + APIdefault.host + addr, 'PARAM: ' + param.file);
+    console.log('POST : ' + APIdefault.host + addr, 'PARAM: ' + param);
     var formData = new FormData();
-    formData.append('file', {
-      uri: param.file.uri,
-      name: param.file.name,
-      type: param.file.type,
-    });
+    // formData.append('files', param.files);
+    // formData.append('userNum', param.userNum);
+    // formData.append('groupNum', param.groupNum);
 
     fetch(APIdefault.host + addr, {
       method: 'POST',
-      body: formData,
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+      body: param,
     })
-      .then(response => {
-        if (response.status === 200) {
-          return response.json();
-        }
-      })
+      .then(response => response.json())
       .then(responseJson => {
         console.log(responseJson);
         if (responsefunc) {

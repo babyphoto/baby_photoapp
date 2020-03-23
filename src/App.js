@@ -20,6 +20,7 @@ import {Router, Scene, Modal, Overlay, Stack} from 'react-native-router-flux';
 import Main from './view/Main';
 import {Color} from './view/common/Color';
 import Login from './view/Login';
+import FileList from './view/group/FileList';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -37,6 +38,7 @@ export default class App extends React.Component {
           <Modal key="modal" hideNavBar>
             <Stack key="home_stack" hideNavBar>
               <Scene key="main" title="main" component={Main} />
+              <Scene key="fileList" title="fileList" component={FileList} />
             </Stack>
             <Stack key="login_stack" initial hideNavBar>
               <Scene key="login" title="login" initial component={Login} />
