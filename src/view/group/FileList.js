@@ -48,6 +48,10 @@ export default class FileList extends React.Component {
   componentWillUnmount() {
     this.exitApp = false;
     BackHandler.removeEventListener('exitAppBackPress', this.handleBackButton);
+    const {callback} = this.props;
+    if (callback) {
+      callback();
+    }
   }
 
   handleBackButton = () => {

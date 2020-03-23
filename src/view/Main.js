@@ -127,6 +127,7 @@ export default class Main extends React.Component {
       param: param,
       title: title,
       userInfo: userInfo,
+      callback: this.callGroupList,
     });
   };
 
