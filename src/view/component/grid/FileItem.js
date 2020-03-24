@@ -1,5 +1,13 @@
 import React from 'react';
-import {StyleSheet, View, Text, Image, TouchableOpacity} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  PermissionsAndroid,
+  Alert,
+} from 'react-native';
 import PropTypes from 'prop-types';
 import {Size} from '../../common/Size';
 import {Color} from '../../common/Color';
@@ -7,6 +15,8 @@ import {CFont} from '../../common/CFont';
 import {API} from '../../common/Api';
 import Video from 'react-native-video';
 import {Util} from '../../common/Util';
+import FastImage from 'react-native-fast-image';
+import RNFetchBlob from 'rn-fetch-blob';
 
 export default class FileItem extends React.PureComponent {
   constructor(props) {
@@ -17,12 +27,50 @@ export default class FileItem extends React.PureComponent {
     };
   }
 
-  componentDidMount() {
-    const {fileInfo} = this.props;
-    console.log('componentDidMount', fileInfo.FilePath);
+  componentDidMount() {}
+
+  async requestStorageAccess() {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'Storage Permission',
+          message: 'App needs access to memory to download the file ',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        const {fileInfo} = this.props;
+        let dirs = RNFetchBlob.fs.dirs;
+
+        RNFetchBlob.config({
+          addAndroidDownloads: {
+            useDownloadManager: true, // <-- this is the only thing required
+            // Optional, override notification setting (default to true)
+            notification: true,
+            // Optional, but recommended since android DownloadManager will fail when
+            // the url does not contains a file extension, by default the mime type will be text/plain
+            mime: 'text/plain',
+            description: 'File downloaded by download manager.',
+            path: dirs.PictureDir + fileInfo.FilePath,
+          },
+        })
+          .fetch('GET', API.downloadURL + fileInfo.FilePath)
+          .then(resp => {
+            console.log(resp);
+            // the path of downloaded file
+            resp.path();
+          });
+      } else {
+        Alert.alert('권한 부족', '파일을 다운로드 할 수 없습니다.');
+      }
+    } catch (err) {
+      console.warn(err);
+    }
   }
 
-  onPress = () => {};
+  onPress = () => {
+    this.requestStorageAccess();
+  };
 
   onBuffer = data => {
     console.log(data);
@@ -72,9 +120,9 @@ export default class FileItem extends React.PureComponent {
                   }}
                   style={styles.photo}
                 />
-                <Image
+                <FastImage
                   style={[styles.photo_thumnail, {height: thumbnailHeight}]}
-                  resizeMode="cover"
+                  resizeMode={FastImage.resizeMode.cover}
                   source={{
                     uri: API.downloadURL + fileName,
                   }}
@@ -82,9 +130,9 @@ export default class FileItem extends React.PureComponent {
               </View>
             ) : (
               <View style={styles.photo_frame}>
-                <Image
+                <FastImage
                   style={styles.photo}
-                  resizeMode="cover"
+                  resizeMode={FastImage.resizeMode.cover}
                   source={{
                     uri: API.downloadURL + fileInfo.FilePath,
                   }}

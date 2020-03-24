@@ -6337,6 +6337,11 @@ react-native-create-thumbnail@1.0.5:
   resolved "https://registry.yarnpkg.com/react-native-create-thumbnail/-/react-native-create-thumbnail-1.0.5.tgz#54cf9d5ab030cac3f33a406aad023c45303b28fa"
   integrity sha512-46lrLqtZF2apwcSEV/3oVwlDkn/xf2Ye9O2Gdm2P8tNvteiFUI6eoqGl4i+TYdwMYx1t0wDw1Dva4iNt/uWvzw==
 
+react-native-fast-image@8.1.5:
+  version "8.1.5"
+  resolved "https://registry.yarnpkg.com/react-native-fast-image/-/react-native-fast-image-8.1.5.tgz#0a6404c988dad68c98d26f91155d0a5293ba2ea5"
+  integrity sha512-DoAWGLeQ2hbllummrpXH9B38OgM0TFmNYCF34F90/hdHZirqUtYHzF4QDdb/NV7ebSijHmM3mpkzct8PXtcYyg==
+
 react-native-fbads@6.3.1:
   version "6.3.1"
   resolved "https://registry.yarnpkg.com/react-native-fbads/-/react-native-fbads-6.3.1.tgz#31c53eabccab6b0615e8a487223720af94be3ff6"
