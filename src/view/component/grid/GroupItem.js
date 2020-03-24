@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import {Size} from '../../common/Size';
 import {Color} from '../../common/Color';
 import {CFont} from '../../common/CFont';
+import {API} from '../../common/Api';
+import {Util} from '../../common/Util';
 
 export default class GroupItem extends React.PureComponent {
   constructor(props) {
@@ -21,7 +23,11 @@ export default class GroupItem extends React.PureComponent {
   render() {
     const {groupInfo} = this.props;
     var isEmptyFile = groupInfo.GroupFileCount === 0;
-
+    var fileName = groupInfo.FilePath;
+    if (Util.isVideo(groupInfo.FilePath)) {
+      var fileExtention = String(groupInfo.FilePath.split(/[. ]+/).pop());
+      fileName = String(groupInfo.FilePath).replace(fileExtention, 'jpg');
+    }
     return (
       <View style={styles.container}>
         <View style={[styles.margin, styles.shadow]}>
@@ -41,8 +47,7 @@ export default class GroupItem extends React.PureComponent {
                 <Image
                   style={styles.photo}
                   source={{
-                    uri:
-                      'https://k.kakaocdn.net/dn/dkqNJQ/btqCOzx45CQ/FfHGU432QWW7Qy7wudNHzK/img_640x640.jpg',
+                    uri: API.downloadURL + fileName,
                   }}
                 />
               </View>

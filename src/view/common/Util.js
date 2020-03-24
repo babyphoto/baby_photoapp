@@ -1,6 +1,14 @@
 import moment from 'moment';
 
 export const Util = {
+  isVideo: function(type) {
+    if (String(type).indexOf('mp4') !== -1) {
+      return true;
+    } else {
+      return false;
+    }
+  },
+
   numberWithCommas: function(x) {
     return String(x).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   },

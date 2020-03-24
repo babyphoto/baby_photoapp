@@ -10,6 +10,7 @@ import {
   ToastAndroid,
   AsyncStorage,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 import {Color} from './common/Color';
 import {Size} from './common/Size';
@@ -32,18 +33,43 @@ export default class Main extends React.Component {
       userInfo: {},
       invitedGroupList: [],
       myGroupList: [],
+      col:
+        Dimensions.get('window').height > Dimensions.get('window').width
+          ? 2
+          : 4,
+      inviteView: null,
+      myView: null,
     };
   }
 
   componentDidMount() {
     BackHandler.addEventListener('exitAppBackPress', this.handleBackButton);
+    Dimensions.addEventListener('change', this.onChange);
     this.init();
   }
 
   componentWillUnmount() {
     this.exitApp = false;
     BackHandler.removeEventListener('exitAppBackPress', this.handleBackButton);
+    Dimensions.removeEventListener('change', this.onChange);
   }
+
+  onChange = ({window, screen}) => {
+    console.log(window, screen);
+    this.setState(
+      {
+        col: window.height > window.width ? 2 : 4,
+        inviteView: <View />,
+        myView: <View />,
+      },
+      () => {
+        this.setState({
+          inviteView: null,
+          myView: null,
+        });
+      },
+    );
+  };
 
   static getDerivedStateFromProps(nextProps, prevState) {
     return null;
@@ -137,8 +163,51 @@ export default class Main extends React.Component {
       userInfo,
       myGroupList,
       invitedGroupList,
+      inviteView,
+      myView,
+      col,
     } = this.state;
     console.log(userInfo);
+
+    var myGrid = <View />;
+    var inviteGrid = <View />;
+
+    if (myView) {
+      myGrid = myView;
+    } else {
+      myGrid = (
+        <Grid
+          scrollEnabled={false}
+          renderItem={(data, i) => {
+            return (
+              <GroupItem groupInfo={data} onPress={this.onClickGroupItem} />
+            );
+          }}
+          data={myGroupList}
+          numColumns={col}
+          keyExtractor={(data, i) => 'myGroupList_' + i.toString()}
+        />
+      );
+    }
+
+    if (inviteView) {
+      inviteGrid = inviteView;
+    } else {
+      inviteGrid = (
+        <Grid
+          scrollEnabled={false}
+          renderItem={(data, i) => {
+            return (
+              <GroupItem groupInfo={data} onPress={this.onClickGroupItem} />
+            );
+          }}
+          data={invitedGroupList}
+          numColumns={col}
+          keyExtractor={(data, i) => 'invitedGroupList_' + i.toString()}
+        />
+      );
+    }
+
     return (
       <SafeAreaView style={styles.container}>
         {Platform.OS === 'ios' ? (
@@ -155,39 +224,13 @@ export default class Main extends React.Component {
                   내 그룹
                 </Text>
               </View>
-              <Grid
-                scrollEnabled={false}
-                renderItem={(data, i) => {
-                  return (
-                    <GroupItem
-                      groupInfo={data}
-                      onPress={this.onClickGroupItem}
-                    />
-                  );
-                }}
-                data={myGroupList}
-                numColumns={2}
-                keyExtractor={(data, i) => 'myGroupList_' + i.toString()}
-              />
+              {myGrid}
               <View style={styles.title_frame}>
                 <Text style={[CFont.subtext2, {color: Color.cffffff}]}>
                   초대받은 그룹
                 </Text>
               </View>
-              <Grid
-                scrollEnabled={false}
-                renderItem={(data, i) => {
-                  return (
-                    <GroupItem
-                      groupInfo={data}
-                      onPress={this.onClickGroupItem}
-                    />
-                  );
-                }}
-                data={invitedGroupList}
-                numColumns={2}
-                keyExtractor={(data, i) => 'invitedGroupList_' + i.toString()}
-              />
+              {inviteGrid}
             </ScrollView>
           </View>
           <ActionButton buttonColor={Color.floatingActionButton}>

@@ -21,6 +21,9 @@ export const API = {
   uploadFiles: (data, res, err) => {
     APIdefault.filePost('/files/upload', data, res, err);
   },
+  uploadThumnail: (data, res, err) => {
+    APIdefault.filePost('/files/thumnail', data, res, err);
+  },
 };
 const APIdefault = {
   host: 'http://112.169.11.118:38080/api',
