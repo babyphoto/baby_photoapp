@@ -21,6 +21,7 @@ import Main from './view/Main';
 import {Color} from './view/common/Color';
 import Login from './view/Login';
 import FileList from './view/group/FileList';
+import FileDetail from './view/group/FileDetail';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -39,6 +40,11 @@ export default class App extends React.Component {
             <Stack key="home_stack" hideNavBar>
               <Scene key="main" title="main" component={Main} />
               <Scene key="fileList" title="fileList" component={FileList} />
+              <Scene
+                key="fileDetail"
+                title="fileDetail"
+                component={FileDetail}
+              />
             </Stack>
             <Stack key="login_stack" initial hideNavBar>
               <Scene key="login" title="login" initial component={Login} />

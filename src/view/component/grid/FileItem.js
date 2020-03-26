@@ -17,6 +17,7 @@ import Video from 'react-native-video';
 import {Util} from '../../common/Util';
 import FastImage from 'react-native-fast-image';
 import RNFetchBlob from 'rn-fetch-blob';
+import {Actions} from 'react-native-router-flux';
 
 export default class FileItem extends React.PureComponent {
   constructor(props) {
@@ -30,6 +31,7 @@ export default class FileItem extends React.PureComponent {
   componentDidMount() {}
 
   async requestStorageAccess() {
+    const {onAdShow} = this.props;
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
@@ -41,7 +43,10 @@ export default class FileItem extends React.PureComponent {
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         const {fileInfo} = this.props;
         let dirs = RNFetchBlob.fs.dirs;
-
+        var fileName = String(fileInfo.FilePath.split(/[\\ ]+/).pop());
+        if (onAdShow) {
+          onAdShow();
+        }
         RNFetchBlob.config({
           addAndroidDownloads: {
             useDownloadManager: true, // <-- this is the only thing required
@@ -51,7 +56,7 @@ export default class FileItem extends React.PureComponent {
             // the url does not contains a file extension, by default the mime type will be text/plain
             mime: 'text/plain',
             description: 'File downloaded by download manager.',
-            path: dirs.PictureDir + fileInfo.FilePath,
+            path: dirs.PictureDir + '/' + fileName,
           },
         })
           .fetch('GET', API.downloadURL + fileInfo.FilePath)
@@ -69,7 +74,11 @@ export default class FileItem extends React.PureComponent {
   }
 
   onPress = () => {
-    this.requestStorageAccess();
+    const {fileInfo} = this.props;
+    Actions.fileDetail({
+      fileInfo: fileInfo,
+    });
+    // this.requestStorageAccess();
   };
 
   onBuffer = data => {

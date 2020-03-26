@@ -35,6 +35,7 @@ export default class FileList extends React.Component {
           ? 2
           : 4,
       isGridView: null,
+      visible: false,
     };
 
     this.gads = new GoogleAds(
@@ -82,7 +83,11 @@ export default class FileList extends React.Component {
     return true;
   };
 
-  onAddFriend = () => {};
+  onAddFriend = () => {
+    this.setState({
+      visible: true,
+    });
+  };
 
   onAddFile = () => {
     ImagePicker.openPicker({
@@ -160,7 +165,7 @@ export default class FileList extends React.Component {
       files,
       res => {
         if (res.result) {
-          // this.callFileList();
+          this.callFileList();
         }
       },
       err => {
@@ -169,8 +174,12 @@ export default class FileList extends React.Component {
     );
   };
 
+  asShowFunc = () => {
+    this.gads.show();
+  };
+
   render() {
-    const {fileList, col, isGridView} = this.state;
+    const {fileList, col, isGridView, visible} = this.state;
     const {title} = this.props;
     var gridView = <View />;
     if (isGridView) {
@@ -180,7 +189,13 @@ export default class FileList extends React.Component {
         <Grid
           style={styles.scroll_frame}
           renderItem={(data, i) => {
-            return <FileItem fileInfo={data} onPress={this.onClickGroupItem} />;
+            return (
+              <FileItem
+                fileInfo={data}
+                onPress={this.onClickGroupItem}
+                onAdShow={this.asShowFunc}
+              />
+            );
           }}
           data={fileList}
           numColumns={col}

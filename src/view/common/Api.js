@@ -24,6 +24,9 @@ export const API = {
   uploadThumnail: (data, res, err) => {
     APIdefault.filePost('/files/thumnail', data, res, err);
   },
+  downloadFile: (data, res, err) => {
+    APIdefault.GET('/files/download', querySring.stringify(data), res, err);
+  },
 };
 const APIdefault = {
   host: 'http://112.169.11.118:38080/api',

@@ -31,7 +31,17 @@ export default class CNavigation extends React.PureComponent {
   };
 
   render() {
-    const {isBack, children, isRight, onRightButton} = this.props;
+    const {
+      isBack,
+      children,
+      isRight,
+      onRightButton,
+      onRightButtonImage,
+    } = this.props;
+    var onRightImage = onRightButtonImage;
+    if (!onRightButtonImage) {
+      onRightImage = require('../../../assets/images/account.png');
+    }
     return (
       <View style={[styles.container, styles.shadow]}>
         <View style={styles.margin}>
@@ -59,10 +69,7 @@ export default class CNavigation extends React.PureComponent {
               <TouchableOpacity
                 style={styles.touchable}
                 onPress={onRightButton}>
-                <Image
-                  style={styles.back_button_image}
-                  source={require('../../../assets/images/account.png')}
-                />
+                <Image style={styles.back_button_image} source={onRightImage} />
               </TouchableOpacity>
             </View>
           ) : (
