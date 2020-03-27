@@ -25,6 +25,7 @@ export default class FileItem extends React.PureComponent {
     this.state = {
       thumbnailImage: '',
       thumbnailHeight: '100%',
+      fastimage_width: 0,
     };
   }
 
@@ -90,7 +91,7 @@ export default class FileItem extends React.PureComponent {
   };
 
   render() {
-    const {thumbnailHeight} = this.state;
+    const {thumbnailHeight, fastimage_width} = this.state;
     const {fileInfo} = this.props;
     var isVideo = Util.isVideo(fileInfo.FileExtention);
     var fileName = '';
@@ -127,6 +128,7 @@ export default class FileItem extends React.PureComponent {
                       thumbnailHeight: '100%',
                     });
                   }}
+                  resizeMode="contain"
                   style={styles.photo}
                 />
                 <FastImage
@@ -140,8 +142,19 @@ export default class FileItem extends React.PureComponent {
             ) : (
               <View style={styles.photo_frame}>
                 <FastImage
+                  style={[styles.photo, {width: fastimage_width}]}
+                  onLoad={e => {
+                    console.log('eee');
+                    this.setState({
+                      fastimage_width: Size.group_max_width,
+                    });
+                  }}
+                  source={{
+                    uri: API.downloadURL + fileInfo.FilePath,
+                  }}
+                />
+                <Image
                   style={styles.photo}
-                  resizeMode={FastImage.resizeMode.cover}
                   source={{
                     uri: API.downloadURL + fileInfo.FilePath,
                   }}
@@ -201,12 +214,12 @@ const styles = StyleSheet.create({
   },
   photo_frame: {
     flex: 1,
-    flexDirection: 'column',
+    flexDirection: 'row',
     position: 'relative',
   },
   photo: {
-    flex: 1,
-    flexDirection: 'column',
+    height: '100%',
+    width: '100%',
   },
   photo_thumnail: {
     width: '100%',

@@ -12,7 +12,15 @@ export const API = {
   groupList: (data, res, err) => {
     APIdefault.GET('/group/groupList?' + querySring.stringify(data), res, err);
   },
-
+  createGroup: (data, res, err) => {
+    APIdefault.POST('/group/createGroup', querySring.stringify(data), res, err);
+  },
+  deleteGroup: (data, res, err) => {
+    APIdefault.POST('/group/deleteGroup', querySring.stringify(data), res, err);
+  },
+  leaveGroup: (data, res, err) => {
+    APIdefault.POST('/group/leaveGroup', querySring.stringify(data), res, err);
+  },
   //file
   downloadURL: 'http://112.169.11.118:38080/api/files/download?path=',
   fileList: (data, res, err) => {

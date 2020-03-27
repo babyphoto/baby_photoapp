@@ -24,6 +24,7 @@ import {CFont} from './common/CFont';
 import Grid from 'react-native-grid-component';
 import GroupItem from './component/grid/GroupItem';
 import {Actions} from 'react-native-router-flux';
+import Confirm from './popup/Confirm';
 
 export default class Main extends React.Component {
   constructor(props) {
@@ -39,7 +40,12 @@ export default class Main extends React.Component {
           : 4,
       inviteView: null,
       myView: null,
+      group_text: '',
+      confirmPopup: <View />,
+      selectedGroup: {},
     };
+    global.confirm_show = this.onShowConfirm;
+    global.confirm_close = this.onCloseConfirm;
   }
 
   componentDidMount() {
@@ -157,6 +163,86 @@ export default class Main extends React.Component {
     });
   };
 
+  showDeleteGroup = param => {
+    this.setState({
+      selectedGroup: param,
+    });
+    global.confirm_show(
+      '그룹삭제',
+      '정말 삭제하시겠습니까?',
+      this.closeDeleteGroup,
+      this.callDelete,
+    );
+  };
+
+  showLeavGroup = param => {
+    this.setState({
+      selectedGroup: param,
+    });
+    global.confirm_show(
+      '그룹 나가기',
+      '정말 그룹에서 나가겠습니까?',
+      this.closeDeleteGroup,
+      this.callLeave,
+    );
+  };
+
+  closeDeleteGroup = () => {
+    global.confirm_close();
+  };
+
+  callLeave = () => {
+    const {userInfo, selectedGroup} = this.state;
+    API.leaveGroup(
+      {
+        userNum: userInfo.UserNum,
+        groupNum: selectedGroup.GroupNum,
+      },
+      res => {
+        if (res) {
+          this.callGroupList();
+          this.closeDeleteGroup();
+        }
+      },
+    );
+  };
+
+  callDelete = () => {
+    const {userInfo, selectedGroup} = this.state;
+    API.deleteGroup(
+      {
+        userNum: userInfo.UserNum,
+        groupNum: selectedGroup.GroupNum,
+      },
+      res => {
+        if (res) {
+          this.callGroupList();
+          this.closeDeleteGroup();
+        }
+      },
+    );
+  };
+
+  onShowConfirm = (title, context, onClose, onConfirm) => {
+    this.setState({
+      confirmPopup: (
+        <Confirm
+          isVisible={true}
+          onClose={onClose}
+          onConfirm={onConfirm}
+          title={title}
+          context={context}
+        />
+      ),
+    });
+  };
+
+  onCloseConfirm = () => {
+    this.setState({
+      confirmPopup: <View />,
+    });
+  };
+
   render() {
     const {
       createGroupPopup,
@@ -166,6 +252,7 @@ export default class Main extends React.Component {
       inviteView,
       myView,
       col,
+      confirmPopup,
     } = this.state;
     console.log(userInfo);
 
@@ -180,7 +267,11 @@ export default class Main extends React.Component {
           scrollEnabled={false}
           renderItem={(data, i) => {
             return (
-              <GroupItem groupInfo={data} onPress={this.onClickGroupItem} />
+              <GroupItem
+                groupInfo={data}
+                onPress={this.onClickGroupItem}
+                onLongPress={this.showDeleteGroup}
+              />
             );
           }}
           data={myGroupList}
@@ -198,7 +289,11 @@ export default class Main extends React.Component {
           scrollEnabled={false}
           renderItem={(data, i) => {
             return (
-              <GroupItem groupInfo={data} onPress={this.onClickGroupItem} />
+              <GroupItem
+                groupInfo={data}
+                onPress={this.onClickGroupItem}
+                onLongPress={this.showLeavGroup}
+              />
             );
           }}
           data={invitedGroupList}
@@ -216,7 +311,7 @@ export default class Main extends React.Component {
           <StatusBar barStyle="dark-content" backgroundColor={Color.cffffff} />
         )}
         <View style={styles.content_frame}>
-          <CNavigation isRight>메인</CNavigation>
+          <CNavigation isRight>{userInfo.UserName} 님의 그룹</CNavigation>
           <View style={styles.list_frame}>
             <ScrollView style={styles.scroll_frame}>
               <View style={styles.title_frame}>
@@ -244,7 +339,10 @@ export default class Main extends React.Component {
           <CreateGroupPopup
             isVisible={createGroupPopup}
             onClose={this.closeCreateGroup}
+            userInfo={userInfo}
+            callback={this.callGroupList}
           />
+          {confirmPopup}
         </View>
       </SafeAreaView>
     );

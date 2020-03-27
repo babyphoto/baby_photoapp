@@ -20,6 +20,13 @@ export default class GroupItem extends React.PureComponent {
     }
   };
 
+  onLongPress = () => {
+    const {onLongPress, groupInfo} = this.props;
+    if (onLongPress) {
+      onLongPress(groupInfo);
+    }
+  };
+
   render() {
     const {groupInfo} = this.props;
     var isEmptyFile = groupInfo.GroupFileCount === 0;
@@ -34,7 +41,8 @@ export default class GroupItem extends React.PureComponent {
           <TouchableOpacity
             disabled={false}
             style={styles.touchable}
-            onPress={this.onPress}>
+            onPress={this.onPress}
+            onLongPress={this.onLongPress}>
             {isEmptyFile ? (
               <View style={styles.empty_frame}>
                 <Image

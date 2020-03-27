@@ -8,6 +8,7 @@ import {
   BackHandler,
   Dimensions,
   Text,
+  Image,
 } from 'react-native';
 import {Color} from '../common/Color';
 import {Actions} from 'react-native-router-flux';
@@ -32,6 +33,9 @@ export default class FileDetail extends React.Component {
       paused: false,
       playerState: PLAYER_STATES.PLAYING,
       screenType: 'content',
+      fastimage_height: 0,
+      cropHeight: Dimensions.get('window').height - Size.navigationHeight,
+      cropWidth: Dimensions.get('window').width,
     };
   }
 
@@ -45,6 +49,14 @@ export default class FileDetail extends React.Component {
     BackHandler.removeEventListener('exitAppBackPress', this.handleBackButton);
     Dimensions.removeEventListener('change', this.onChange);
   }
+
+  onChange = ({window, screen}) => {
+    console.log(window, screen);
+    this.setState({
+      cropHeight: Dimensions.get('window').height - Size.navigationHeight,
+      cropWidth: Dimensions.get('window').width,
+    });
+  };
 
   onSeek = seek => {
     this.videoPlayer.seek(seek);
@@ -66,10 +78,18 @@ export default class FileDetail extends React.Component {
       this.setState({currentTime: data.currentTime});
     }
   };
-  onLoad = data => this.setState({duration: data.duration, isLoading: false});
-  onLoadStart = data => this.setState({isLoading: true});
-  onEnd = () => this.setState({playerState: PLAYER_STATES.ENDED});
-  onError = () => alert('Oh! ', error);
+  onLoad = data => {
+    this.setState({duration: data.duration, isLoading: false});
+  };
+  onLoadStart = data => {
+    this.setState({isLoading: true});
+  };
+  onEnd = () => {
+    this.setState({playerState: PLAYER_STATES.ENDED});
+  };
+  onError = () => {
+    alert('Oh! ', error);
+  };
   exitFullScreen = () => {
     alert('Exit full screen');
   };
@@ -93,7 +113,12 @@ export default class FileDetail extends React.Component {
   };
 
   render() {
-    const {thumbnailHeight} = this.state;
+    const {
+      thumbnailHeight,
+      fastimage_height,
+      cropHeight,
+      cropWidth,
+    } = this.state;
     const {fileInfo} = this.props;
     console.log(fileInfo);
     var isVideo = Util.isVideo(fileInfo.FileExtention);
@@ -148,17 +173,20 @@ export default class FileDetail extends React.Component {
           ) : (
             <View style={styles.photo_frame}>
               <ImageZoom
-                cropWidth={Dimensions.get('window').width}
-                cropHeight={
-                  Dimensions.get('window').height - Size.navigationHeight
-                }
-                imageWidth={Dimensions.get('window').width}
-                imageHeight={
-                  Dimensions.get('window').height - Size.navigationHeight
-                }>
+                cropWidth={cropWidth}
+                cropHeight={cropHeight}
+                imageWidth={cropWidth}
+                imageHeight={cropHeight}>
                 <FastImage
+                  style={[styles.photo, {height: fastimage_height}]}
+                  resizeMode={FastImage.resizeMode.contain}
+                  source={{
+                    uri: API.downloadURL + fileInfo.FilePath,
+                  }}
+                />
+                <Image
                   style={styles.photo}
-                  resizeMode={FastImage.resizeMode.cover}
+                  resizeMode="contain"
                   source={{
                     uri: API.downloadURL + fileInfo.FilePath,
                   }}
@@ -197,10 +225,11 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     position: 'relative',
+    backgroundColor: Color.c000000,
   },
   photo: {
-    flex: 1,
-    flexDirection: 'column',
+    height: '100%',
+    width: '100%',
   },
   video_frame: {
     flex: 1,

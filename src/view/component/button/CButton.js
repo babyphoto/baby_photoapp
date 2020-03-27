@@ -18,7 +18,7 @@ export default class CButton extends React.PureComponent {
   render() {
     const {style, children, disable} = this.props;
     return (
-      <View style={[styles.container, style]}>
+      <View style={[style]}>
         <TouchableOpacity
           activeOpacity={disable ? 1 : 0.2}
           style={styles.touchable}
@@ -37,12 +37,9 @@ CButton.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    height: '100%',
-    width: '100%',
-  },
   touchable: {
     height: '100%',
     width: '100%',
+    flexDirection: 'column',
   },
 });

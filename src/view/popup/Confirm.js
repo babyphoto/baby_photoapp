@@ -12,11 +12,9 @@ import PropTypes from 'prop-types';
 import {Color} from '../common/Color';
 import {Size} from '../common/Size';
 import {CFont} from '../common/CFont';
-import CTextField from '../component/textfleid/CTextField';
 import CButton from '../component/button/CButton';
-import {API} from '../common/Api';
 
-export default class CreateGroupPopup extends React.PureComponent {
+export default class Confirm extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -27,46 +25,20 @@ export default class CreateGroupPopup extends React.PureComponent {
 
   close = () => {
     const {onClose} = this.props;
-    this.setState({
-      group_text: '',
-    });
     if (onClose) {
       onClose();
     }
   };
 
   confirm = () => {
-    const {group_text} = this.state;
-    const {userInfo, callback} = this.props;
-    API.createGroup(
-      {
-        userNum: userInfo.UserNum,
-        groupName: group_text,
-      },
-      res => {
-        if (res) {
-          if (res === 'Create fail - Group Name Exist') {
-            alert('이미 같은 이름의 그룹이 존재합니다.');
-          } else {
-            if (callback) {
-              callback();
-            }
-            this.close();
-          }
-        }
-      },
-    );
-  };
-
-  onChangeText = text => {
-    this.setState({
-      group_text: text,
-    });
+    const {onConfirm} = this.props;
+    if (onConfirm) {
+      onConfirm();
+    }
   };
 
   render() {
-    const {group_text} = this.state;
-    const {isVisible} = this.props;
+    const {isVisible, title, context} = this.props;
     return (
       <Modal
         animationType="fade"
@@ -81,14 +53,13 @@ export default class CreateGroupPopup extends React.PureComponent {
               <View style={styles.content}>
                 <View style={styles.title_frame}>
                   <Text style={[CFont.body2, {color: Color.navtitle}]}>
-                    그룹 생성
+                    {title}
                   </Text>
                 </View>
                 <View style={styles.input_frame}>
-                  <CTextField
-                    initText={group_text}
-                    onChangeText={this.onChangeText}
-                  />
+                  <Text style={[CFont.subtext, {color: Color.navtitle}]}>
+                    {context}
+                  </Text>
                 </View>
                 <View style={styles.button_frame}>
                   <CButton style={styles.button} onPress={this.close}>
@@ -115,7 +86,7 @@ export default class CreateGroupPopup extends React.PureComponent {
   }
 }
 
-CreateGroupPopup.propTypes = {
+Confirm.propTypes = {
   onPress: PropTypes.func,
   data: PropTypes.object,
   disable: PropTypes.bool,
@@ -135,7 +106,7 @@ const styles = StyleSheet.create({
   },
   popup_back: {
     backgroundColor: Color.cffffff,
-    minHeight: Size.height(160),
+    minHeight: Size.height(100),
     width: '90%',
     flexDirection: 'column',
   },
@@ -163,7 +134,8 @@ const styles = StyleSheet.create({
   input_frame: {
     marginRight: Size.width(24),
     marginLeft: Size.width(24),
-    height: Size.height(50),
+    flexDirection: 'column',
+    justifyContent: 'center',
   },
   button_frame: {
     height: Size.height(52),
