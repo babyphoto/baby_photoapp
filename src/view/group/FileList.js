@@ -102,20 +102,27 @@ export default class FileList extends React.Component {
     });
   };
 
-  callAddInvite = (userNum, inviteUserNum, groupNum) => {
+  callAddInvite = inviteUserInfo => {
+    const {param, userInfo} = this.props;
+
     API.inviteGroup(
       {
-        userNum: userNum,
-        groupNum: groupNum,
-        inviteUserNum: inviteUserNum,
+        userNum: userInfo.UserNum,
+        groupNum: param.GroupNum,
+        inviteUserNum: inviteUserInfo.UserNum,
       },
       res => {
         if (res) {
           if (res === 'Invite Success') {
             this.closeProfile();
-            alert('초대되었습니다.');
+            Alert.alert('친구초대', '초대되었습니다.');
+          } else if (res === 'Invite fail - Lack of authority') {
+            Alert.alert('친구초대 실패', '초대할 수 있는 권한이 없습니다.');
           } else {
-            alert('초대에 실패했습니다. 잠시후 다시 시도해주세요.');
+            Alert.alert(
+              '유저초대 실패',
+              '초대에 실패했습니다. 잠시후 다시 시도해주세요.',
+            );
           }
         }
       },

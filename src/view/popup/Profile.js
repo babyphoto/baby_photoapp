@@ -77,6 +77,9 @@ export default class Profile extends React.PureComponent {
   render() {
     const {ableInvite} = this.state;
     const {isVisible, userInfo, isInvite, buttonCallback} = this.props;
+    var profile = userInfo.UserProfile
+      ? {uri: userInfo.UserProfile}
+      : require('../../assets/images/account.png');
     return (
       <Modal
         animationType="fade"
@@ -90,10 +93,7 @@ export default class Profile extends React.PureComponent {
               style={[styles.popup_back, styles.shadow]}>
               <View style={styles.content}>
                 <View style={styles.profile_image_frame}>
-                  <Image
-                    style={styles.profile_image}
-                    source={{uri: userInfo.UserProfile}}
-                  />
+                  <Image style={styles.profile_image} source={profile} />
                 </View>
                 <View style={styles.profile_name_frame}>
                   <Text style={[CFont.body2, {color: Color.c0a214b}]}>
@@ -116,7 +116,9 @@ export default class Profile extends React.PureComponent {
                 </View>
                 <View style={styles.button_frame}>
                   <CButton
-                    onPress={buttonCallback}
+                    onPress={() => {
+                      buttonCallback(userInfo);
+                    }}
                     disable={ableInvite ? !ableInvite : false}>
                     <View style={styles.button}>
                       <Text

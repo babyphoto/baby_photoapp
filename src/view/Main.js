@@ -26,6 +26,7 @@ import GroupItem from './component/grid/GroupItem';
 import {Actions} from 'react-native-router-flux';
 import Confirm from './popup/Confirm';
 import Profile from './popup/Profile';
+import RNKakaoLogins from '@react-native-seoul/kakao-login';
 
 export default class Main extends React.Component {
   constructor(props) {
@@ -102,19 +103,30 @@ export default class Main extends React.Component {
   };
 
   onLogout = () => {
-    AsyncStorage.removeItem(Keys.userinfo)
-      .then(() => {
-        AsyncStorage.removeItem(Keys.login)
+    RNKakaoLogins.logout()
+      .then(result => {
+        AsyncStorage.removeItem(Keys.userinfo)
           .then(() => {
-            this.onCloseProfile();
-            Actions.replace('login_stack');
+            AsyncStorage.removeItem(Keys.login)
+              .then(() => {
+                this.onCloseProfile();
+                Actions.replace('login_stack');
+              })
+              .catch(err => {
+                console.error(err);
+              });
           })
           .catch(err => {
             console.error(err);
           });
       })
       .catch(err => {
-        console.error(err);
+        if (err.code === 'E_CANCELLED_OPERATION') {
+          console.log(err.message);
+        } else {
+          console.log(err.code);
+          console.log(err.message);
+        }
       });
   };
 
