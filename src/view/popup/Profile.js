@@ -137,7 +137,7 @@ export default class Profile extends React.PureComponent {
                 </View>
                 <View style={styles.app_version_frame}>
                   <Text style={[CFont.small_bold_text, {color: Color.cba74e8}]}>
-                    {Strings.version}
+                    {isInvite ? '' : Strings.version}
                   </Text>
                 </View>
                 <View style={styles.back_frame}>

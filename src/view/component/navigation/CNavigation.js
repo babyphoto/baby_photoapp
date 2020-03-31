@@ -37,13 +37,14 @@ export default class CNavigation extends React.PureComponent {
       isRight,
       onRightButton,
       onRightButtonImage,
+      style,
     } = this.props;
     var onRightImage = onRightButtonImage;
     if (!onRightButtonImage) {
       onRightImage = require('../../../assets/images/account.png');
     }
     return (
-      <View style={[styles.container, styles.shadow]}>
+      <View style={[styles.container, styles.shadow, style]}>
         <View style={styles.margin}>
           {isBack ? (
             <View style={styles.back_button_frame}>

@@ -63,7 +63,6 @@ export default class Main extends React.Component {
   }
 
   onChange = ({window, screen}) => {
-    console.log(window, screen);
     this.setState(
       {
         col: window.height > window.width ? 2 : 4,
@@ -293,7 +292,6 @@ export default class Main extends React.Component {
       confirmPopup,
       profilePopup,
     } = this.state;
-    console.log(userInfo);
 
     var myGrid = <View />;
     var inviteGrid = <View />;

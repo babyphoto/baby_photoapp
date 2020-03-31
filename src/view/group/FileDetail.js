@@ -40,14 +40,8 @@ export default class FileDetail extends React.Component {
       fastimage_width: 0,
       cropHeight: Dimensions.get('window').height - Size.navigationHeight,
       cropWidth: Dimensions.get('window').width,
+      navbar_height: Size.navigationHeight,
     };
-
-    this.gads = new GoogleAds(
-      () => {
-        console.log('Advert ready to show.');
-      },
-      event => {},
-    );
   }
 
   componentDidMount() {
@@ -62,7 +56,7 @@ export default class FileDetail extends React.Component {
   }
 
   async requestStorageAccess() {
-    const {fileInfo} = this.props;
+    const {fileInfo, adShowFunc} = this.props;
     try {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
@@ -74,7 +68,9 @@ export default class FileDetail extends React.Component {
       if (granted === PermissionsAndroid.RESULTS.GRANTED) {
         let dirs = RNFetchBlob.fs.dirs;
         var fileName = String(fileInfo.FilePath.split(/[\\ ]+/).pop());
-        this.gads.show();
+        if (adShowFunc) {
+          adShowFunc();
+        }
         RNFetchBlob.config({
           addAndroidDownloads: {
             useDownloadManager: true, // <-- this is the only thing required
@@ -89,7 +85,6 @@ export default class FileDetail extends React.Component {
         })
           .fetch('GET', API.downloadURL + fileInfo.FilePath)
           .then(resp => {
-            console.log(resp);
             // the path of downloaded file
             resp.path();
           });
@@ -108,8 +103,14 @@ export default class FileDetail extends React.Component {
   onChange = ({window, screen}) => {
     console.log(window, screen);
     this.setState({
-      cropHeight: Dimensions.get('window').height - Size.navigationHeight,
+      cropHeight:
+        Dimensions.get('window').height -
+        (screen.height > screen.width ? Size.navigationHeight : Size.height(0)),
       cropWidth: Dimensions.get('window').width,
+      fastimage_width:
+        this.state.fastimage_width !== 0 ? Dimensions.get('window').width : 0,
+      navbar_height:
+        screen.height > screen.width ? Size.navigationHeight : Size.height(0),
     });
   };
 
@@ -173,6 +174,7 @@ export default class FileDetail extends React.Component {
       fastimage_width,
       cropHeight,
       cropWidth,
+      navbar_height,
     } = this.state;
     const {fileInfo} = this.props;
     var isVideo = Util.isVideo(fileInfo.FileExtention);
@@ -196,6 +198,7 @@ export default class FileDetail extends React.Component {
             isRight
             onRightButtonImage={require('../../assets/images/download.png')}
             onRightButton={this.onDownLoad}
+            style={{height: navbar_height}}
           />
           {isVideo ? (
             <View style={styles.video_frame}>
@@ -237,7 +240,7 @@ export default class FileDetail extends React.Component {
                   style={[styles.photo, {width: fastimage_width}]}
                   resizeMode={FastImage.resizeMode.contain}
                   onLoad={e => {
-                    console.log('fileDetail');
+                    console.log('fileDetail', Size.viewWidth);
                     this.setState({
                       fastimage_width: Size.viewWidth,
                     });

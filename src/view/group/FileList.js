@@ -69,7 +69,6 @@ export default class FileList extends React.Component {
   }
 
   onChange = ({window, screen}) => {
-    console.log(window, screen);
     this.setState(
       {
         col: window.height > window.width ? 2 : 4,
@@ -146,25 +145,44 @@ export default class FileList extends React.Component {
     ImagePicker.openPicker({
       multiple: true,
       mediaType: 'photo',
+      showsSelectedCount: true,
+      maxFiles: 5,
     }).then(images => {
-      const {userInfo, param} = this.props;
-      console.log(userInfo, param);
-      let data = new FormData();
+      var selectImageSize = 0;
+      var selectImageCount = 0;
+      var maxImageSize = 15728640;
+      var oneMb = 1048576;
       images.forEach((value, index) => {
-        console.log(value);
-        data.append('files', {
-          uri: value.path,
-          type: value.mime,
-          name: value.path.split(/[/ ]+/).pop(),
-        });
-        if (Util.isVideo(value.mime)) {
-          this.makeThumnailAndPushServer(value);
-        }
+        selectImageSize += value.size;
+        selectImageSize += 1;
       });
-      data.append('userNum', userInfo.UserNum);
-      data.append('groupNum', param.GroupNum);
-      this.gads.show();
-      this.callUploadFiles(data);
+      console.log(selectImageCount, selectImageSize);
+      if (selectImageSize > maxImageSize && selectImageCount > 1) {
+        Alert.alert(
+          '업로드 실패',
+          '앱 성능을 위해 한번에 최대 올릴 수 있는 사진 사이즈는 15MB입니다. 현재 선택하신 사이즈는 ' +
+            Math.round(selectImageSize / oneMb) +
+            'MB입니다.',
+        );
+      } else {
+        const {userInfo, param} = this.props;
+        let data = new FormData();
+        images.forEach((value, index) => {
+          console.log(value);
+          data.append('files', {
+            uri: value.path,
+            type: value.mime,
+            name: value.path.split(/[/ ]+/).pop(),
+          });
+          if (Util.isVideo(value.mime)) {
+            this.makeThumnailAndPushServer(value);
+          }
+        });
+        data.append('userNum', userInfo.UserNum);
+        data.append('groupNum', param.GroupNum);
+        this.gads.show();
+        this.callUploadFiles(data);
+      }
     });
   };
 
@@ -175,7 +193,6 @@ export default class FileList extends React.Component {
       type: 'local',
     })
       .then(response => {
-        console.log(response);
         let data = new FormData();
         data.append('file', {
           uri: response.path,
@@ -187,7 +204,6 @@ export default class FileList extends React.Component {
           fileExtention,
           'jpg',
         );
-        console.log(fileExtention, fileName);
         data.append('userNum', userInfo.UserNum);
         data.append('fileName', fileName);
         API.uploadThumnail(data, res => {
@@ -288,6 +304,7 @@ export default class FileList extends React.Component {
                 fileInfo={data}
                 onPress={this.onClickGroupItem}
                 onLongPress={this.onLongPress}
+                adShowFunc={this.adShowFunc}
               />
             );
           }}

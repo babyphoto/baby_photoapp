@@ -31,9 +31,10 @@ export default class FileItem extends React.PureComponent {
   componentDidMount() {}
 
   onPress = () => {
-    const {fileInfo} = this.props;
+    const {fileInfo, adShowFunc} = this.props;
     Actions.fileDetail({
       fileInfo: fileInfo,
+      adShowFunc: adShowFunc,
     });
     // this.requestStorageAccess();
   };
@@ -45,9 +46,7 @@ export default class FileItem extends React.PureComponent {
     }
   };
 
-  onBuffer = data => {
-    console.log(data);
-  };
+  onBuffer = data => {};
 
   videoError = err => {};
 

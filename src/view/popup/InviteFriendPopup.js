@@ -85,6 +85,13 @@ export default class InviteFriendPopup extends React.PureComponent {
                     친구추가
                   </Text>
                 </View>
+                <View style={styles.input_info_frame}>
+                  <Text style={[CFont.subtext2, {color: Color.c770bbf}]}>
+                    {
+                      '친구의 아이디를 입력해주세요!\n아이디는 프로필에서 확인하실수 있습니다.'
+                    }
+                  </Text>
+                </View>
                 <View style={styles.input_frame}>
                   <CTextField
                     initText={friend_id}
@@ -165,6 +172,13 @@ const styles = StyleSheet.create({
     marginRight: Size.width(24),
     marginLeft: Size.width(24),
     height: Size.height(50),
+  },
+  input_info_frame: {
+    marginRight: Size.width(24),
+    marginLeft: Size.width(24),
+    height: Size.height(50),
+    flexDirection: 'column',
+    justifyContent: 'center',
   },
   button_frame: {
     height: Size.height(52),
