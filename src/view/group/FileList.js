@@ -7,6 +7,7 @@ import {
   View,
   BackHandler,
   Dimensions,
+  Alert,
 } from 'react-native';
 import CNavigation from '../component/navigation/CNavigation';
 import {Color} from '../common/Color';
@@ -20,6 +21,8 @@ import Grid from 'react-native-grid-component';
 import FileItem from '../component/grid/FileItem';
 import {createThumbnail} from 'react-native-create-thumbnail';
 import {Util} from '../common/Util';
+import InviteFriendPopup from '../popup/InviteFriendPopup';
+import Profile from '../popup/Profile';
 export default class FileList extends React.Component {
   constructor(props) {
     super(props);
@@ -36,6 +39,8 @@ export default class FileList extends React.Component {
           : 4,
       isGridView: null,
       visible: false,
+      inviteFriendPopup: false,
+      profilePopup: <View />,
     };
 
     this.gads = new GoogleAds(
@@ -83,16 +88,64 @@ export default class FileList extends React.Component {
     return true;
   };
 
-  onAddFriend = () => {
+  showProfile = userInfo => {
+    const {param} = this.props;
     this.setState({
-      visible: true,
+      profilePopup: (
+        <Profile
+          onClose={this.closeProfile}
+          userInfo={userInfo}
+          groupInfo={param}
+          buttonCallback={this.callAddInvite}
+          isInvite
+        />
+      ),
     });
   };
 
+  callAddInvite = (userNum, inviteUserNum, groupNum) => {
+    API.inviteGroup(
+      {
+        userNum: userNum,
+        groupNum: groupNum,
+        inviteUserNum: inviteUserNum,
+      },
+      res => {
+        if (res) {
+          if (res === 'Invite Success') {
+            this.closeProfile();
+            alert('초대되었습니다.');
+          } else {
+            alert('초대에 실패했습니다. 잠시후 다시 시도해주세요.');
+          }
+        }
+      },
+    );
+  };
+
+  closeProfile = () => {
+    this.setState({
+      profilePopup: <View />,
+    });
+  };
+
+  onAddFriend = () => {
+    this.setState({
+      inviteFriendPopup: true,
+    });
+  };
+
+  closeAddFriend = () => {
+    this.setState({
+      inviteFriendPopup: false,
+    });
+  };
+
+  // mediaType변경시 Vedio도 가능
   onAddFile = () => {
     ImagePicker.openPicker({
       multiple: true,
-      mediaType: 'any',
+      mediaType: 'photo',
     }).then(images => {
       const {userInfo, param} = this.props;
       console.log(userInfo, param);
@@ -174,13 +227,54 @@ export default class FileList extends React.Component {
     );
   };
 
-  asShowFunc = () => {
+  adShowFunc = () => {
     this.gads.show();
   };
 
+  onLongPress = fileInfo => {
+    global.confirm_show(
+      '사진삭제',
+      '선택한 사진을 삭제하시겠습니까?',
+      () => {
+        global.confirm_close();
+      },
+      () => {
+        global.confirm_close();
+        this.callDeleteFile(fileInfo);
+      },
+    );
+  };
+
+  callDeleteFile = fileInfo => {
+    const {userInfo, param} = this.props;
+    API.deleteFile(
+      {
+        userNum: userInfo.UserNum,
+        groupNum: param.GroupNum,
+        fileNum: fileInfo.FileNum,
+      },
+      res => {
+        if (res) {
+          if (res === 'Delete fail - Lack of authority') {
+            Alert.alert('삭제실패', '권한이 부족합니다.');
+          } else {
+            Alert.alert('사진삭제', '사진이 삭제되었습니다.');
+            this.callFileList();
+          }
+        }
+      },
+    );
+  };
+
   render() {
-    const {fileList, col, isGridView, visible} = this.state;
-    const {title} = this.props;
+    const {
+      fileList,
+      col,
+      isGridView,
+      inviteFriendPopup,
+      profilePopup,
+    } = this.state;
+    const {title, userInfo} = this.props;
     var gridView = <View />;
     if (isGridView) {
       gridView = isGridView;
@@ -193,7 +287,7 @@ export default class FileList extends React.Component {
               <FileItem
                 fileInfo={data}
                 onPress={this.onClickGroupItem}
-                onAdShow={this.asShowFunc}
+                onLongPress={this.onLongPress}
               />
             );
           }}
@@ -214,6 +308,13 @@ export default class FileList extends React.Component {
         <View style={styles.content_frame}>
           <CNavigation isBack>{title}</CNavigation>
           <View style={styles.list_frame}>{gridView}</View>
+          <InviteFriendPopup
+            isVisible={inviteFriendPopup}
+            onClose={this.closeAddFriend}
+            userInfo={userInfo}
+            profileFunc={this.showProfile}
+          />
+          {profilePopup}
         </View>
         <ActionButton buttonColor={Color.floatingActionButton}>
           <ActionButton.Item

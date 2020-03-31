@@ -24,7 +24,12 @@ export const Util = {
   stringToDateTime: function(dateString) {
     return moment(dateString, 'YYYY-MM-DD hh:mm:ss').toDate();
   },
-
+  //'YYYY-MM-DD hh:mm:ss'
+  stringToDateString: function(dateString, format) {
+    return moment(moment(dateString, format).toDate()).format(
+      'YYYY.MM.DD. hh:mm:ss',
+    );
+  },
   diffTimeWithCurrent: function(end) {
     var t2 = Util.stringToDateTime(end);
     var t1 = new Date();

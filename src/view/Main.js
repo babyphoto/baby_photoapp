@@ -25,6 +25,7 @@ import Grid from 'react-native-grid-component';
 import GroupItem from './component/grid/GroupItem';
 import {Actions} from 'react-native-router-flux';
 import Confirm from './popup/Confirm';
+import Profile from './popup/Profile';
 
 export default class Main extends React.Component {
   constructor(props) {
@@ -42,6 +43,7 @@ export default class Main extends React.Component {
       myView: null,
       group_text: '',
       confirmPopup: <View />,
+      profilePopup: <View />,
       selectedGroup: {},
     };
     global.confirm_show = this.onShowConfirm;
@@ -98,6 +100,23 @@ export default class Main extends React.Component {
         },
       );
     });
+  };
+
+  onLogout = () => {
+    AsyncStorage.removeItem(Keys.userinfo)
+      .then(() => {
+        AsyncStorage.removeItem(Keys.login)
+          .then(() => {
+            this.onCloseProfile();
+            Actions.replace('login_stack');
+          })
+          .catch(err => {
+            console.error(err);
+          });
+      })
+      .catch(err => {
+        console.error(err);
+      });
   };
 
   callGroupList = () => {
@@ -243,6 +262,25 @@ export default class Main extends React.Component {
     });
   };
 
+  onShowProfile = () => {
+    const {userInfo} = this.state;
+    this.setState({
+      profilePopup: (
+        <Profile
+          onClose={this.onCloseProfile}
+          userInfo={userInfo}
+          buttonCallback={this.onLogout}
+        />
+      ),
+    });
+  };
+
+  onCloseProfile = () => {
+    this.setState({
+      profilePopup: <View />,
+    });
+  };
+
   render() {
     const {
       createGroupPopup,
@@ -253,6 +291,7 @@ export default class Main extends React.Component {
       myView,
       col,
       confirmPopup,
+      profilePopup,
     } = this.state;
     console.log(userInfo);
 
@@ -311,7 +350,9 @@ export default class Main extends React.Component {
           <StatusBar barStyle="dark-content" backgroundColor={Color.cffffff} />
         )}
         <View style={styles.content_frame}>
-          <CNavigation isRight>{userInfo.UserName} 님의 그룹</CNavigation>
+          <CNavigation isRight onRightButton={this.onShowProfile}>
+            {userInfo.UserName} 님의 그룹
+          </CNavigation>
           <View style={styles.list_frame}>
             <ScrollView style={styles.scroll_frame}>
               <View style={styles.title_frame}>
@@ -343,6 +384,7 @@ export default class Main extends React.Component {
             callback={this.callGroupList}
           />
           {confirmPopup}
+          {profilePopup}
         </View>
       </SafeAreaView>
     );

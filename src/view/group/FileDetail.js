@@ -9,6 +9,8 @@ import {
   Dimensions,
   Text,
   Image,
+  PermissionsAndroid,
+  Alert,
 } from 'react-native';
 import {Color} from '../common/Color';
 import {Actions} from 'react-native-router-flux';
@@ -21,6 +23,8 @@ import MediaControls, {PLAYER_STATES} from 'react-native-media-controls';
 import Video from 'react-native-video';
 import CNavigation from '../component/navigation/CNavigation';
 import {Size} from '../common/Size';
+import RNFetchBlob from 'rn-fetch-blob';
+import GoogleAds from '../component/ads/GoogleAds';
 export default class FileDetail extends React.Component {
   constructor(props) {
     super(props);
@@ -33,10 +37,17 @@ export default class FileDetail extends React.Component {
       paused: false,
       playerState: PLAYER_STATES.PLAYING,
       screenType: 'content',
-      fastimage_height: 0,
+      fastimage_width: 0,
       cropHeight: Dimensions.get('window').height - Size.navigationHeight,
       cropWidth: Dimensions.get('window').width,
     };
+
+    this.gads = new GoogleAds(
+      () => {
+        console.log('Advert ready to show.');
+      },
+      event => {},
+    );
   }
 
   componentDidMount() {
@@ -49,6 +60,50 @@ export default class FileDetail extends React.Component {
     BackHandler.removeEventListener('exitAppBackPress', this.handleBackButton);
     Dimensions.removeEventListener('change', this.onChange);
   }
+
+  async requestStorageAccess() {
+    const {fileInfo} = this.props;
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+        {
+          title: 'Storage Permission',
+          message: 'App needs access to memory to download the file ',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        let dirs = RNFetchBlob.fs.dirs;
+        var fileName = String(fileInfo.FilePath.split(/[\\ ]+/).pop());
+        this.gads.show();
+        RNFetchBlob.config({
+          addAndroidDownloads: {
+            useDownloadManager: true, // <-- this is the only thing required
+            // Optional, override notification setting (default to true)
+            notification: true,
+            // Optional, but recommended since android DownloadManager will fail when
+            // the url does not contains a file extension, by default the mime type will be text/plain
+            mime: 'text/plain',
+            description: 'File downloaded by download manager.',
+            path: dirs.PictureDir + '/' + fileName,
+          },
+        })
+          .fetch('GET', API.downloadURL + fileInfo.FilePath)
+          .then(resp => {
+            console.log(resp);
+            // the path of downloaded file
+            resp.path();
+          });
+      } else {
+        Alert.alert('권한 부족', '파일을 다운로드 할 수 없습니다.');
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  }
+
+  onDownLoad = () => {
+    this.requestStorageAccess();
+  };
 
   onChange = ({window, screen}) => {
     console.log(window, screen);
@@ -115,12 +170,11 @@ export default class FileDetail extends React.Component {
   render() {
     const {
       thumbnailHeight,
-      fastimage_height,
+      fastimage_width,
       cropHeight,
       cropWidth,
     } = this.state;
     const {fileInfo} = this.props;
-    console.log(fileInfo);
     var isVideo = Util.isVideo(fileInfo.FileExtention);
     var fileName = '';
     if (isVideo) {
@@ -141,6 +195,7 @@ export default class FileDetail extends React.Component {
             isBack
             isRight
             onRightButtonImage={require('../../assets/images/download.png')}
+            onRightButton={this.onDownLoad}
           />
           {isVideo ? (
             <View style={styles.video_frame}>
@@ -173,13 +228,20 @@ export default class FileDetail extends React.Component {
           ) : (
             <View style={styles.photo_frame}>
               <ImageZoom
+                style={styles.photo_frame}
                 cropWidth={cropWidth}
                 cropHeight={cropHeight}
                 imageWidth={cropWidth}
                 imageHeight={cropHeight}>
                 <FastImage
-                  style={[styles.photo, {height: fastimage_height}]}
+                  style={[styles.photo, {width: fastimage_width}]}
                   resizeMode={FastImage.resizeMode.contain}
+                  onLoad={e => {
+                    console.log('fileDetail');
+                    this.setState({
+                      fastimage_width: Size.viewWidth,
+                    });
+                  }}
                   source={{
                     uri: API.downloadURL + fileInfo.FilePath,
                   }}
@@ -223,7 +285,7 @@ const styles = StyleSheet.create({
   },
   photo_frame: {
     flex: 1,
-    flexDirection: 'column',
+    flexDirection: 'row',
     position: 'relative',
     backgroundColor: Color.c000000,
   },

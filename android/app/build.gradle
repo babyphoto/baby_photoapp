@@ -132,8 +132,8 @@ android {
         applicationId "kr.sherwher.babyphoto"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.0.2"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
     }

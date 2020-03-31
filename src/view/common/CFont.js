@@ -2,6 +2,13 @@ import {StyleSheet} from 'react-native';
 import {Size} from './Size';
 
 export const CFont = StyleSheet.create({
+  logo: {
+    fontFamily: 'SpicyRice-Regular',
+    fontSize: Size.width(40),
+    fontWeight: '400',
+    fontStyle: 'normal',
+    textAlign: 'left',
+  },
   title: {
     fontFamily: 'NotoSansKR-Bold',
     fontSize: Size.width(20),

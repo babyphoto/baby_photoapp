@@ -16,7 +16,6 @@ import {API} from '../../common/Api';
 import Video from 'react-native-video';
 import {Util} from '../../common/Util';
 import FastImage from 'react-native-fast-image';
-import RNFetchBlob from 'rn-fetch-blob';
 import {Actions} from 'react-native-router-flux';
 
 export default class FileItem extends React.PureComponent {
@@ -31,49 +30,6 @@ export default class FileItem extends React.PureComponent {
 
   componentDidMount() {}
 
-  async requestStorageAccess() {
-    const {onAdShow} = this.props;
-    try {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        {
-          title: 'Storage Permission',
-          message: 'App needs access to memory to download the file ',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        const {fileInfo} = this.props;
-        let dirs = RNFetchBlob.fs.dirs;
-        var fileName = String(fileInfo.FilePath.split(/[\\ ]+/).pop());
-        if (onAdShow) {
-          onAdShow();
-        }
-        RNFetchBlob.config({
-          addAndroidDownloads: {
-            useDownloadManager: true, // <-- this is the only thing required
-            // Optional, override notification setting (default to true)
-            notification: true,
-            // Optional, but recommended since android DownloadManager will fail when
-            // the url does not contains a file extension, by default the mime type will be text/plain
-            mime: 'text/plain',
-            description: 'File downloaded by download manager.',
-            path: dirs.PictureDir + '/' + fileName,
-          },
-        })
-          .fetch('GET', API.downloadURL + fileInfo.FilePath)
-          .then(resp => {
-            console.log(resp);
-            // the path of downloaded file
-            resp.path();
-          });
-      } else {
-        Alert.alert('권한 부족', '파일을 다운로드 할 수 없습니다.');
-      }
-    } catch (err) {
-      console.warn(err);
-    }
-  }
-
   onPress = () => {
     const {fileInfo} = this.props;
     Actions.fileDetail({
@@ -82,13 +38,18 @@ export default class FileItem extends React.PureComponent {
     // this.requestStorageAccess();
   };
 
+  onLongPress = () => {
+    const {onLongPress, fileInfo} = this.props;
+    if (onLongPress) {
+      onLongPress(fileInfo);
+    }
+  };
+
   onBuffer = data => {
     console.log(data);
   };
 
-  videoError = err => {
-    console.log(err);
-  };
+  videoError = err => {};
 
   render() {
     const {thumbnailHeight, fastimage_width} = this.state;
@@ -107,7 +68,8 @@ export default class FileItem extends React.PureComponent {
           <TouchableOpacity
             disabled={false}
             style={styles.touchable}
-            onPress={this.onPress}>
+            onPress={this.onPress}
+            onLongPress={this.onLongPress}>
             {isVideo ? (
               <View style={styles.photo_frame}>
                 <Video
@@ -143,10 +105,10 @@ export default class FileItem extends React.PureComponent {
               <View style={styles.photo_frame}>
                 <FastImage
                   style={[styles.photo, {width: fastimage_width}]}
+                  resizeMode={FastImage.resizeMode.contain}
                   onLoad={e => {
-                    console.log('eee');
                     this.setState({
-                      fastimage_width: Size.group_max_width,
+                      fastimage_width: '100%',
                     });
                   }}
                   source={{
@@ -155,6 +117,7 @@ export default class FileItem extends React.PureComponent {
                 />
                 <Image
                   style={styles.photo}
+                  resizeMode="contain"
                   source={{
                     uri: API.downloadURL + fileInfo.FilePath,
                   }}

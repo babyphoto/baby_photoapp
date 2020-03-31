@@ -4,9 +4,23 @@ import {Keys} from './Keys';
 import {Actions} from 'react-native-router-flux';
 
 export const API = {
-  //login
+  //user
   registUser: (data, res, err) => {
     APIdefault.POST('/user/regist', querySring.stringify(data), res, err);
+  },
+  userSearch: (data, res, err) => {
+    APIdefault.GET(
+      '/user/userSearchWithNickName?' + querySring.stringify(data),
+      res,
+      err,
+    );
+  },
+  groupUserList: (data, res, err) => {
+    APIdefault.GET(
+      '/user/groupUserList?' + querySring.stringify(data),
+      res,
+      err,
+    );
   },
   //group
   groupList: (data, res, err) => {
@@ -21,6 +35,9 @@ export const API = {
   leaveGroup: (data, res, err) => {
     APIdefault.POST('/group/leaveGroup', querySring.stringify(data), res, err);
   },
+  inviteGroup: (data, res, err) => {
+    APIdefault.POST('/group/inviteGroup', querySring.stringify(data), res, err);
+  },
   //file
   downloadURL: 'http://112.169.11.118:38080/api/files/download?path=',
   fileList: (data, res, err) => {
@@ -34,6 +51,9 @@ export const API = {
   },
   downloadFile: (data, res, err) => {
     APIdefault.GET('/files/download', querySring.stringify(data), res, err);
+  },
+  deleteFile: (data, res, err) => {
+    APIdefault.POST('/files/delete', querySring.stringify(data), res, err);
   },
 };
 const APIdefault = {

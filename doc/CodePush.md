@@ -11,6 +11,18 @@ appcenter apps create -d MyApp-iOS -o iOS -p React-Native
 
 appcenter codepush deployment add -a <ownerName>/<appName> Staging
 appcenter codepush deployment add -a <ownerName>/<appName> Production
+
+
+
+코드푸쉬 배포(IOS)
+code-push release-react babyphoto-ios ios --mandatory true
+IOS 배포상태 확인
+code-push deployment ls szbabyphotot-ios -k
+코드푸쉬 배포(android)
+code-push release-react babyphoto-android android --deploymentName Production
+android 배포상태 확인
+code-push deployment ls babyphoto-android -k
+
 ```
 
 ```
