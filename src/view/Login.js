@@ -17,9 +17,22 @@ import {API} from './common/Api';
 import {Keys} from './common/Keys';
 import {Actions} from 'react-native-router-flux';
 import {CFont} from './common/CFont';
+import {
+  LoginManager,
+  AccessToken,
+  ShareDialog,
+  GraphRequest,
+  GraphRequestManager,
+} from 'react-native-fbsdk';
+
 export default class Login extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      profileImage: '',
+      profile: {},
+    };
 
     AsyncStorage.getItem(Keys.login).then(value => {
       if (value === 'Y') {
@@ -53,6 +66,49 @@ export default class Login extends React.Component {
         }
       });
   };
+
+  clickFaceBookLogin = () => {
+    LoginManager.logInWithPermissions(['public_profile']).then(
+      result => {
+        console.log(result);
+        if (result.isCancelled) {
+          console.log('Login cancelled');
+        } else {
+          AccessToken.getCurrentAccessToken().then(data => {
+            //TODO login success process
+            console.log(data);
+            this.getPublicProfile();
+            // this.oAuthLogin('facebook', data.userID);
+          });
+        }
+      },
+      error => {
+        //TODO login fail process
+        console.log('Login fail with error: ' + error);
+      },
+    );
+  };
+
+  async getPublicProfile() {
+    const infoRequest = new GraphRequest(
+      '/me?fields=id,name,email,picture',
+      null,
+      (err, result) => {
+        if (err) {
+          console.log('Error fetching data: ' + err.toString());
+        } else {
+          console.log(result);
+          this.oAuthLogin({
+            platform: 'facebook',
+            id: result.id,
+            name: result.name,
+            profile: result.picture.data.url,
+          });
+        }
+      },
+    );
+    new GraphRequestManager().addRequest(infoRequest).start();
+  }
 
   oAuthLogin = param => {
     API.registUser(
@@ -108,6 +164,11 @@ export default class Login extends React.Component {
             backgroundImage={require('../assets/images/Kakao_Login.png')}
             onPress={this.clickKakaoLogin}
           />
+          <CImageButton
+            style={styles.button_frame}
+            backgroundImage={require('../assets/images/Facebook_Login.png')}
+            onPress={this.clickFaceBookLogin}
+          />
         </View>
       </SafeAreaView>
     );
@@ -143,7 +204,7 @@ const styles = StyleSheet.create({
   button_frame: {
     height: Size.height(39),
     width: Size.width(265),
-    marginBottom: Size.height(150),
+    marginTop: Size.height(8),
   },
   nav_frame: {
     height: Size.height(62),

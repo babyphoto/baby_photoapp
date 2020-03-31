@@ -27,6 +27,7 @@ import {Actions} from 'react-native-router-flux';
 import Confirm from './popup/Confirm';
 import Profile from './popup/Profile';
 import RNKakaoLogins from '@react-native-seoul/kakao-login';
+import {LoginManager} from 'react-native-fbsdk';
 
 export default class Main extends React.Component {
   constructor(props) {
@@ -103,31 +104,51 @@ export default class Main extends React.Component {
   };
 
   onLogout = () => {
-    RNKakaoLogins.logout()
-      .then(result => {
-        AsyncStorage.removeItem(Keys.userinfo)
-          .then(() => {
-            AsyncStorage.removeItem(Keys.login)
-              .then(() => {
-                this.onCloseProfile();
-                Actions.replace('login_stack');
-              })
-              .catch(err => {
-                console.error(err);
-              });
-          })
-          .catch(err => {
-            console.error(err);
-          });
-      })
-      .catch(err => {
-        if (err.code === 'E_CANCELLED_OPERATION') {
-          console.log(err.message);
-        } else {
-          console.log(err.code);
-          console.log(err.message);
-        }
-      });
+    const {userInfo} = this.state;
+    console.log(userInfo);
+    if (userInfo.UserType === 'kakao') {
+      RNKakaoLogins.logout()
+        .then(result => {
+          AsyncStorage.removeItem(Keys.userinfo)
+            .then(() => {
+              AsyncStorage.removeItem(Keys.login)
+                .then(() => {
+                  this.onCloseProfile();
+                  Actions.replace('login_stack');
+                })
+                .catch(err => {
+                  console.error(err);
+                });
+            })
+            .catch(err => {
+              console.error(err);
+            });
+        })
+        .catch(err => {
+          if (err.code === 'E_CANCELLED_OPERATION') {
+            console.log(err.message);
+          } else {
+            console.log(err.code);
+            console.log(err.message);
+          }
+        });
+    } else {
+      LoginManager.logOut();
+      AsyncStorage.removeItem(Keys.userinfo)
+        .then(() => {
+          AsyncStorage.removeItem(Keys.login)
+            .then(() => {
+              this.onCloseProfile();
+              Actions.replace('login_stack');
+            })
+            .catch(err => {
+              console.error(err);
+            });
+        })
+        .catch(err => {
+          console.error(err);
+        });
+    }
   };
 
   callGroupList = () => {
