@@ -29,7 +29,6 @@ export default class FileDetail extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      thumbnailHeight: 0,
       currentTime: 0,
       duration: 0,
       isFullScreen: false,
@@ -37,7 +36,6 @@ export default class FileDetail extends React.Component {
       paused: false,
       playerState: PLAYER_STATES.PLAYING,
       screenType: 'content',
-      fastimage_width: 0,
       cropHeight: Dimensions.get('window').height - Size.navigationHeight,
       cropWidth: Dimensions.get('window').width,
       navbar_height: Size.navigationHeight,
@@ -169,13 +167,7 @@ export default class FileDetail extends React.Component {
   };
 
   render() {
-    const {
-      thumbnailHeight,
-      fastimage_width,
-      cropHeight,
-      cropWidth,
-      navbar_height,
-    } = this.state;
+    const {cropHeight, cropWidth, navbar_height} = this.state;
     const {fileInfo} = this.props;
     var isVideo = Util.isVideo(fileInfo.FileExtention);
     var fileName = '';
@@ -185,6 +177,7 @@ export default class FileDetail extends React.Component {
         'jpg',
       );
     }
+
     return (
       <SafeAreaView style={styles.container}>
         {Platform.OS === 'ios' ? (
@@ -237,21 +230,8 @@ export default class FileDetail extends React.Component {
                 imageWidth={cropWidth}
                 imageHeight={cropHeight}>
                 <FastImage
-                  style={[styles.photo, {width: fastimage_width}]}
+                  style={[styles.photo]}
                   resizeMode={FastImage.resizeMode.contain}
-                  onLoad={e => {
-                    console.log('fileDetail', Size.viewWidth);
-                    this.setState({
-                      fastimage_width: Size.viewWidth,
-                    });
-                  }}
-                  source={{
-                    uri: API.downloadURL + fileInfo.FilePath,
-                  }}
-                />
-                <Image
-                  style={styles.photo}
-                  resizeMode="contain"
                   source={{
                     uri: API.downloadURL + fileInfo.FilePath,
                   }}
@@ -293,8 +273,7 @@ const styles = StyleSheet.create({
     backgroundColor: Color.c000000,
   },
   photo: {
-    height: '100%',
-    width: '100%',
+    flex: 1,
   },
   video_frame: {
     flex: 1,

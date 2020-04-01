@@ -24,7 +24,6 @@ export default class FileItem extends React.PureComponent {
     this.state = {
       thumbnailImage: '',
       thumbnailHeight: '100%',
-      isFastImage: false,
     };
   }
 
@@ -53,7 +52,6 @@ export default class FileItem extends React.PureComponent {
   render() {
     const {thumbnailHeight, isFastImage} = this.state;
     const {fileInfo} = this.props;
-    console.log(fileInfo);
     var isVideo = Util.isVideo(fileInfo.FileExtention);
     var fileName = '';
     if (isVideo) {
@@ -105,28 +103,13 @@ export default class FileItem extends React.PureComponent {
               </View>
             ) : (
               <View style={styles.photo_frame}>
-                {isFastImage ? (
-                  <FastImage
-                    style={styles.photo}
-                    resizeMode={FastImage.resizeMode.cover}
-                    onLoad={e => {
-                      this.setState({
-                        isFastImage: true,
-                      });
-                    }}
-                    source={{
-                      uri: API.downloadURL + fileInfo.FileThumbnail,
-                    }}
-                  />
-                ) : (
-                  <Image
-                    style={styles.photo}
-                    resizeMode="cover"
-                    source={{
-                      uri: API.downloadURL + fileInfo.FileThumbnail,
-                    }}
-                  />
-                )}
+                <FastImage
+                  style={styles.photo}
+                  resizeMode={FastImage.resizeMode.cover}
+                  source={{
+                    uri: API.downloadURL + fileInfo.FileThumbnail,
+                  }}
+                />
               </View>
             )}
           </TouchableOpacity>
