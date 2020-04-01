@@ -24,6 +24,7 @@ import {Util} from '../common/Util';
 import InviteFriendPopup from '../popup/InviteFriendPopup';
 import Profile from '../popup/Profile';
 import CProgress from '../popup/CProgress';
+import ImageEditor from '@react-native-community/image-editor';
 export default class FileList extends React.Component {
   constructor(props) {
     super(props);
@@ -181,6 +182,9 @@ export default class FileList extends React.Component {
       // } else {
 
       // }
+      this.setState({
+        isProgress: true,
+      });
       const {userInfo, param} = this.props;
       let data = new FormData();
       images.forEach((value, index) => {
@@ -192,6 +196,8 @@ export default class FileList extends React.Component {
         });
         if (Util.isVideo(value.mime)) {
           this.makeThumnailAndPushServer(value);
+        } else {
+          this.makeResizeImage(value);
         }
       });
       data.append('userNum', userInfo.UserNum);
@@ -199,6 +205,34 @@ export default class FileList extends React.Component {
       this.gads.show();
       this.callUploadFiles(data);
     });
+  };
+
+  makeResizeImage = param => {
+    const {userInfo} = this.props;
+    console.log(param);
+    ImageEditor.cropImage(param.path, {
+      offset: {x: 0, y: 0}, // crop 시작 위치
+      size: {width: param.width, height: param.height},
+      displaySize: {width: 2048, height: 2048},
+      resizeMode: 'cover',
+    })
+      .then(value => {
+        console.log('resize', value);
+        let data = new FormData();
+        data.append('file', {
+          uri: value,
+          type: param.mime,
+          name: param.path.split(/[/ ]+/).pop(),
+        });
+        data.append('userNum', userInfo.UserNum);
+        data.append('fileName', param.path.split(/[/ ]+/).pop());
+        API.uploadThumnail(data, res => {
+          console.log('thum', res);
+        });
+      })
+      .catch(err => {
+        console.log(err);
+      });
   };
 
   makeThumnailAndPushServer = param => {
@@ -245,20 +279,6 @@ export default class FileList extends React.Component {
   };
 
   callUploadFiles = files => {
-    // API.uploadFiles(
-    //   files,
-    //   res => {
-    //     if (res.result) {
-    //       this.callFileList();
-    //     }
-    //   },
-    //   err => {
-    //     console.log(err);
-    //   },
-    // );
-    this.setState({
-      isProgress: true,
-    });
     API.uploadProgress(
       files,
       res => {

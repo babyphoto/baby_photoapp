@@ -109,20 +109,7 @@ export default class Main extends React.Component {
     if (userInfo.UserType === 'kakao') {
       RNKakaoLogins.logout()
         .then(result => {
-          AsyncStorage.removeItem(Keys.userinfo)
-            .then(() => {
-              AsyncStorage.removeItem(Keys.login)
-                .then(() => {
-                  this.onCloseProfile();
-                  Actions.replace('login_stack');
-                })
-                .catch(err => {
-                  console.error(err);
-                });
-            })
-            .catch(err => {
-              console.error(err);
-            });
+          console.log('ddd');
         })
         .catch(err => {
           if (err.code === 'E_CANCELLED_OPERATION') {
@@ -131,6 +118,20 @@ export default class Main extends React.Component {
             console.log(err.code);
             console.log(err.message);
           }
+        });
+      AsyncStorage.removeItem(Keys.userinfo)
+        .then(() => {
+          AsyncStorage.removeItem(Keys.login)
+            .then(() => {
+              this.onCloseProfile();
+              Actions.replace('login_stack');
+            })
+            .catch(err => {
+              console.error(err);
+            });
+        })
+        .catch(err => {
+          console.error(err);
         });
     } else {
       LoginManager.logOut();

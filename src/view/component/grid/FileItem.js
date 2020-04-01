@@ -53,13 +53,16 @@ export default class FileItem extends React.PureComponent {
   render() {
     const {thumbnailHeight, isFastImage} = this.state;
     const {fileInfo} = this.props;
+    console.log(fileInfo);
     var isVideo = Util.isVideo(fileInfo.FileExtention);
     var fileName = '';
     if (isVideo) {
-      fileName = String(fileInfo.FilePath).replace(
+      fileName = String(fileInfo.FileThumbnail).replace(
         fileInfo.FileExtention,
         'jpg',
       );
+    } else {
+      fileName = fileInfo.FileThumbnail;
     }
     return (
       <View style={styles.container}>
@@ -112,7 +115,7 @@ export default class FileItem extends React.PureComponent {
                       });
                     }}
                     source={{
-                      uri: API.downloadURL + fileInfo.FilePath,
+                      uri: API.downloadURL + fileInfo.FileThumbnail,
                     }}
                   />
                 ) : (
@@ -120,7 +123,7 @@ export default class FileItem extends React.PureComponent {
                     style={styles.photo}
                     resizeMode="cover"
                     source={{
-                      uri: API.downloadURL + fileInfo.FilePath,
+                      uri: API.downloadURL + fileInfo.FileThumbnail,
                     }}
                   />
                 )}

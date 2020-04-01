@@ -180,7 +180,7 @@ export default class FileDetail extends React.Component {
     var isVideo = Util.isVideo(fileInfo.FileExtention);
     var fileName = '';
     if (isVideo) {
-      fileName = String(fileInfo.FilePath).replace(
+      fileName = String(fileInfo.FileThumbnail).replace(
         fileInfo.FileExtention,
         'jpg',
       );

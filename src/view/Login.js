@@ -35,11 +35,25 @@ export default class Login extends React.Component {
       profileImage: '',
       profile: {},
       agreement: false,
+      display: false,
     };
 
     AsyncStorage.getItem(Keys.login).then(value => {
       if (value === 'Y') {
-        Actions.replace('home_stack');
+        AsyncStorage.getItem(Keys.userinfo).then(value1 => {
+          console.log('relogin', value1);
+          var result = JSON.parse(value1);
+          this.oAuthLogin({
+            platform: result.UserType,
+            id: result.UserCode,
+            name: result.UserName,
+            profile: result.UserProfile,
+          });
+        });
+      } else {
+        this.setState({
+          display: true,
+        });
       }
     });
   }
@@ -155,7 +169,17 @@ export default class Login extends React.Component {
             .catch(err => {
               console.error(err);
             });
+        } else {
+          this.setState({
+            display: true,
+          });
         }
+      },
+      err => {
+        console.log(err);
+        this.setState({
+          display: true,
+        });
       },
     );
   };
@@ -188,7 +212,7 @@ export default class Login extends React.Component {
   };
 
   render() {
-    const {agreement} = this.state;
+    const {agreement, display} = this.state;
     return (
       <SafeAreaView style={styles.container}>
         {Platform.OS === 'ios' ? (
@@ -196,48 +220,54 @@ export default class Login extends React.Component {
         ) : (
           <StatusBar barStyle="dark-content" backgroundColor={Color.cffffff} />
         )}
-        <View style={styles.content_frame}>
-          <View style={styles.logo_frame}>
-            <Image
-              style={styles.logo}
-              source={require('../assets/images/logo.png')}
+        {display ? (
+          <View style={styles.content_frame}>
+            <View style={styles.logo_frame}>
+              <Image
+                style={styles.logo}
+                source={require('../assets/images/logo.png')}
+              />
+            </View>
+            <View style={styles.logo_text_frame}>
+              <Text style={[CFont.logo, {color: Color.c0a214b}]}>
+                Baby Photo
+              </Text>
+            </View>
+            <CImageButton
+              style={styles.button_frame}
+              backgroundImage={require('../assets/images/Kakao_Login.png')}
+              onPress={this.clickKakaoLogin}
             />
-          </View>
-          <View style={styles.logo_text_frame}>
-            <Text style={[CFont.logo, {color: Color.c0a214b}]}>Baby Photo</Text>
-          </View>
-          <CImageButton
-            style={styles.button_frame}
-            backgroundImage={require('../assets/images/Kakao_Login.png')}
-            onPress={this.clickKakaoLogin}
-          />
-          <CImageButton
-            style={styles.button_frame}
-            backgroundImage={require('../assets/images/Facebook_Login.png')}
-            onPress={this.clickFaceBookLogin}
-          />
-          <View style={styles.check_button_frame}>
-            <CButton style={styles.check_button} onPress={this.onClickAgree}>
-              <View style={styles.check_button_back}>
-                <View style={styles.check_icon_frame}>
-                  <Image
-                    style={styles.check_icon}
-                    source={
-                      agreement
-                        ? require('../assets/images/on-check-box-white.png')
-                        : require('../assets/images/off-check-box-white.png')
-                    }
-                  />
+            <CImageButton
+              style={styles.button_frame}
+              backgroundImage={require('../assets/images/Facebook_Login.png')}
+              onPress={this.clickFaceBookLogin}
+            />
+            <View style={styles.check_button_frame}>
+              <CButton style={styles.check_button} onPress={this.onClickAgree}>
+                <View style={styles.check_button_back}>
+                  <View style={styles.check_icon_frame}>
+                    <Image
+                      style={styles.check_icon}
+                      source={
+                        agreement
+                          ? require('../assets/images/on-check-box-white.png')
+                          : require('../assets/images/off-check-box-white.png')
+                      }
+                    />
+                  </View>
+                  <View style={styles.check_title_frame}>
+                    <Text style={[CFont.subtext2, {color: Color.cffffff}]}>
+                      주의사항에 동의하시겠습니까?
+                    </Text>
+                  </View>
                 </View>
-                <View style={styles.check_title_frame}>
-                  <Text style={[CFont.subtext2, {color: Color.cffffff}]}>
-                    주의사항에 동의하시겠습니까?
-                  </Text>
-                </View>
-              </View>
-            </CButton>
+              </CButton>
+            </View>
           </View>
-        </View>
+        ) : (
+          <View />
+        )}
       </SafeAreaView>
     );
   }
