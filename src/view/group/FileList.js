@@ -225,7 +225,7 @@ export default class FileList extends React.Component {
           name: param.path.split(/[/ ]+/).pop(),
         });
         data.append('userNum', userInfo.UserNum);
-        data.append('fileName', param.path.split(/[/ ]+/).pop());
+        data.append('fileName', param.path.split(/[/]+/).pop());
         API.uploadThumnail(data, res => {
           console.log('thum', res);
         });
