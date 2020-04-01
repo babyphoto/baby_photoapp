@@ -55,6 +55,11 @@ export const API = {
   deleteFile: (data, res, err) => {
     APIdefault.POST('/files/delete', querySring.stringify(data), res, err);
   },
+  uploadProgress: (data, res, err, process) => {
+    APIdefault.fileProgress('/files/upload', data, process)
+      .then(res)
+      .catch(err);
+  },
 };
 const APIdefault = {
   host: 'http://112.169.11.118:38080/api',
@@ -126,5 +131,25 @@ const APIdefault = {
           errfunc(error);
         }
       });
+  },
+  fileProgress: (addr, param, progress) => {
+    return new Promise((resolve, reject) => {
+      console.log(APIdefault.host + addr, param);
+      var oReq = new XMLHttpRequest();
+      oReq.upload.addEventListener('progress', ev => {
+        progress(ev);
+      });
+      oReq.open('POST', APIdefault.host + addr);
+      oReq.send(param);
+      oReq.onreadystatechange = function() {
+        if (oReq.readyState === XMLHttpRequest.DONE) {
+          let data = JSON.parse(oReq.responseText);
+          resolve(data);
+        }
+      };
+      oReq.onerror = function(err) {
+        reject(err);
+      };
+    });
   },
 };

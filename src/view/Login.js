@@ -8,6 +8,7 @@ import {
   Text,
   AsyncStorage,
   Image,
+  Alert,
 } from 'react-native';
 import {Color} from './common/Color';
 import {Size} from './common/Size';
@@ -24,6 +25,7 @@ import {
   GraphRequest,
   GraphRequestManager,
 } from 'react-native-fbsdk';
+import CButton from './component/button/CButton';
 
 export default class Login extends React.Component {
   constructor(props) {
@@ -32,6 +34,7 @@ export default class Login extends React.Component {
     this.state = {
       profileImage: '',
       profile: {},
+      agreement: false,
     };
 
     AsyncStorage.getItem(Keys.login).then(value => {
@@ -42,51 +45,67 @@ export default class Login extends React.Component {
   }
 
   clickKakaoLogin = () => {
-    RNKakaoLogins.login()
-      .then(result => {
-        RNKakaoLogins.getProfile((err, result1) => {
-          if (err) {
-            console.log(err);
-            return;
-          }
-          this.oAuthLogin({
-            platform: 'kakao',
-            id: result1.id,
-            name: result1.nickname,
-            profile: result1.profile_image_url,
+    const {agreement} = this.state;
+    if (agreement) {
+      RNKakaoLogins.login()
+        .then(result => {
+          RNKakaoLogins.getProfile((err, result1) => {
+            if (err) {
+              console.log(err);
+              return;
+            }
+            this.oAuthLogin({
+              platform: 'kakao',
+              id: result1.id,
+              name: result1.nickname,
+              profile: result1.profile_image_url,
+            });
           });
+        })
+        .catch(err => {
+          if (err.code === 'E_CANCELLED_OPERATION') {
+            console.log(err.message);
+          } else {
+            console.log(err.code);
+            console.log(err.message);
+          }
         });
-      })
-      .catch(err => {
-        if (err.code === 'E_CANCELLED_OPERATION') {
-          console.log(err.message);
-        } else {
-          console.log(err.code);
-          console.log(err.message);
-        }
-      });
+    } else {
+      Alert.alert(
+        '주의사항 동의',
+        '주의사항에 동의하셔야 이용하실 수 있습니다.',
+      );
+    }
   };
 
   clickFaceBookLogin = () => {
-    LoginManager.logInWithPermissions(['public_profile']).then(
-      result => {
-        console.log(result);
-        if (result.isCancelled) {
-          console.log('Login cancelled');
-        } else {
-          AccessToken.getCurrentAccessToken().then(data => {
-            //TODO login success process
-            console.log(data);
-            this.getPublicProfile();
-            // this.oAuthLogin('facebook', data.userID);
-          });
-        }
-      },
-      error => {
-        //TODO login fail process
-        console.log('Login fail with error: ' + error);
-      },
-    );
+    const {agreement} = this.state;
+    if (agreement) {
+      LoginManager.logInWithPermissions(['public_profile']).then(
+        result => {
+          console.log(result);
+          if (result.isCancelled) {
+            console.log('Login cancelled');
+          } else {
+            AccessToken.getCurrentAccessToken().then(data => {
+              //TODO login success process
+              console.log(data);
+              this.getPublicProfile();
+              // this.oAuthLogin('facebook', data.userID);
+            });
+          }
+        },
+        error => {
+          //TODO login fail process
+          console.log('Login fail with error: ' + error);
+        },
+      );
+    } else {
+      Alert.alert(
+        '주의사항 동의',
+        '주의사항에 동의하셔야 이용하실 수 있습니다.',
+      );
+    }
   };
 
   async getPublicProfile() {
@@ -141,7 +160,35 @@ export default class Login extends React.Component {
     );
   };
 
+  // text?: string;
+  //   onPress?: (value?: string) => void;
+  //   style?: 'default' | 'cancel' | 'destructive';
+  onClickAgree = () => {
+    Alert.alert(
+      '주의사항',
+      '해당 앱은 사진을 업로드, 다운로드, 확인하는 앱으로 데이터의 소비가 큰 서비스입니다. WiFi사용을 권장합니다.',
+      [
+        {
+          text: '취소',
+          onPress: () =>
+            this.setState({
+              agreement: false,
+            }),
+          style: 'cancel',
+        },
+        {
+          text: '동의',
+          onPress: () =>
+            this.setState({
+              agreement: true,
+            }),
+        },
+      ],
+    );
+  };
+
   render() {
+    const {agreement} = this.state;
     return (
       <SafeAreaView style={styles.container}>
         {Platform.OS === 'ios' ? (
@@ -169,6 +216,27 @@ export default class Login extends React.Component {
             backgroundImage={require('../assets/images/Facebook_Login.png')}
             onPress={this.clickFaceBookLogin}
           />
+          <View style={styles.check_button_frame}>
+            <CButton style={styles.check_button} onPress={this.onClickAgree}>
+              <View style={styles.check_button_back}>
+                <View style={styles.check_icon_frame}>
+                  <Image
+                    style={styles.check_icon}
+                    source={
+                      agreement
+                        ? require('../assets/images/on-check-box-white.png')
+                        : require('../assets/images/off-check-box-white.png')
+                    }
+                  />
+                </View>
+                <View style={styles.check_title_frame}>
+                  <Text style={[CFont.subtext2, {color: Color.cffffff}]}>
+                    주의사항에 동의하시겠습니까?
+                  </Text>
+                </View>
+              </View>
+            </CButton>
+          </View>
         </View>
       </SafeAreaView>
     );
@@ -205,6 +273,40 @@ const styles = StyleSheet.create({
     height: Size.height(39),
     width: Size.width(265),
     marginTop: Size.height(8),
+  },
+  check_button_frame: {
+    height: Size.height(30),
+    width: Size.width(265),
+    marginTop: Size.height(11),
+  },
+  check_button: {
+    height: '100%',
+    width: '100%',
+    borderRadius: Size.height(3),
+    backgroundColor: Color.c0a214b,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  check_button_back: {
+    height: '100%',
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  check_icon_frame: {
+    marginLeft: Size.width(10),
+    marginRight: Size.width(13),
+    height: Size.width(20),
+    width: Size.width(20),
+  },
+  check_icon: {
+    height: Size.width(20),
+    width: Size.width(20),
+  },
+  check_title_frame: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
   },
   nav_frame: {
     height: Size.height(62),

@@ -23,6 +23,7 @@ import {createThumbnail} from 'react-native-create-thumbnail';
 import {Util} from '../common/Util';
 import InviteFriendPopup from '../popup/InviteFriendPopup';
 import Profile from '../popup/Profile';
+import CProgress from '../popup/CProgress';
 export default class FileList extends React.Component {
   constructor(props) {
     super(props);
@@ -41,6 +42,12 @@ export default class FileList extends React.Component {
       visible: false,
       inviteFriendPopup: false,
       profilePopup: <View />,
+      isProgress: false,
+      progressData: {
+        total: 0,
+        loaded: 0,
+        per: 0,
+      },
     };
 
     this.gads = new GoogleAds(
@@ -155,41 +162,42 @@ export default class FileList extends React.Component {
       showsSelectedCount: true,
       maxFiles: 5,
     }).then(images => {
-      var selectImageSize = 0;
-      var selectImageCount = 0;
-      var maxImageSize = 15728640;
-      var oneMb = 1048576;
+      // var selectImageSize = 0;
+      // var selectImageCount = 0;
+      // var maxImageSize = 15728640;
+      // var oneMb = 1048576;
+      // images.forEach((value, index) => {
+      //   selectImageSize += value.size;
+      //   selectImageSize += 1;
+      // });
+      // console.log(selectImageCount, selectImageSize);
+      // if (selectImageSize > maxImageSize && selectImageCount > 1) {
+      //   Alert.alert(
+      //     '업로드 실패',
+      //     '앱 성능을 위해 한번에 최대 올릴 수 있는 사진 사이즈는 15MB입니다. 현재 선택하신 사이즈는 ' +
+      //       Math.round(selectImageSize / oneMb) +
+      //       'MB입니다.',
+      //   );
+      // } else {
+
+      // }
+      const {userInfo, param} = this.props;
+      let data = new FormData();
       images.forEach((value, index) => {
-        selectImageSize += value.size;
-        selectImageSize += 1;
-      });
-      console.log(selectImageCount, selectImageSize);
-      if (selectImageSize > maxImageSize && selectImageCount < 1) {
-        Alert.alert(
-          '업로드 실패',
-          '앱 성능을 위해 한번에 최대 올릴 수 있는 사진 사이즈는 15MB입니다. 현재 선택하신 사이즈는 ' +
-            Math.round(selectImageSize / oneMb) +
-            'MB입니다.',
-        );
-      } else {
-        const {userInfo, param} = this.props;
-        let data = new FormData();
-        images.forEach((value, index) => {
-          console.log(value);
-          data.append('files', {
-            uri: value.path,
-            type: value.mime,
-            name: value.path.split(/[/ ]+/).pop(),
-          });
-          if (Util.isVideo(value.mime)) {
-            this.makeThumnailAndPushServer(value);
-          }
+        console.log(value);
+        data.append('files', {
+          uri: value.path,
+          type: value.mime,
+          name: value.path.split(/[/ ]+/).pop(),
         });
-        data.append('userNum', userInfo.UserNum);
-        data.append('groupNum', param.GroupNum);
-        this.gads.show();
-        this.callUploadFiles(data);
-      }
+        if (Util.isVideo(value.mime)) {
+          this.makeThumnailAndPushServer(value);
+        }
+      });
+      data.append('userNum', userInfo.UserNum);
+      data.append('groupNum', param.GroupNum);
+      this.gads.show();
+      this.callUploadFiles(data);
     });
   };
 
@@ -237,15 +245,54 @@ export default class FileList extends React.Component {
   };
 
   callUploadFiles = files => {
-    API.uploadFiles(
+    // API.uploadFiles(
+    //   files,
+    //   res => {
+    //     if (res.result) {
+    //       this.callFileList();
+    //     }
+    //   },
+    //   err => {
+    //     console.log(err);
+    //   },
+    // );
+    this.setState({
+      isProgress: true,
+    });
+    API.uploadProgress(
       files,
       res => {
+        console.log(res);
         if (res.result) {
-          this.callFileList();
+          if (res.result === 'file upload success') {
+            this.callFileList();
+            this.setState({
+              isProgress: false,
+              progressData: {
+                total: 0,
+                loaded: 0,
+                per: 0,
+              },
+            });
+          }
         }
       },
       err => {
         console.log(err);
+      },
+      oEvent => {
+        if (oEvent.lengthComputable) {
+          var percentComplete = (oEvent.loaded / oEvent.total) * 100;
+          this.setState({
+            progressData: {
+              total: oEvent.total,
+              loaded: oEvent.loaded,
+              per: percentComplete,
+            },
+          });
+        } else {
+          // Unable to compute progress information since the total size is unknown
+        }
       },
     );
   };
@@ -296,6 +343,8 @@ export default class FileList extends React.Component {
       isGridView,
       inviteFriendPopup,
       profilePopup,
+      isProgress,
+      progressData,
     } = this.state;
     const {title, userInfo} = this.props;
     var gridView = <View />;
@@ -339,6 +388,11 @@ export default class FileList extends React.Component {
             profileFunc={this.showProfile}
           />
           {profilePopup}
+          <CProgress
+            isVisible={isProgress}
+            data={progressData}
+            adShowFunc={this.adShowFunc}
+          />
         </View>
         <ActionButton buttonColor={Color.floatingActionButton}>
           <ActionButton.Item
