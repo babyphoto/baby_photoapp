@@ -6,11 +6,14 @@ import {Color} from '../../common/Color';
 import {CFont} from '../../common/CFont';
 import {API} from '../../common/Api';
 import {Util} from '../../common/Util';
+import FastImage from 'react-native-fast-image';
 
 export default class GroupItem extends React.PureComponent {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      isFastImage: false,
+    };
   }
 
   onPress = () => {
@@ -29,12 +32,37 @@ export default class GroupItem extends React.PureComponent {
 
   render() {
     const {groupInfo} = this.props;
+    const {isFastImage} = this.state;
     var isEmptyFile = groupInfo.GroupFileCount === 0;
     var fileName = groupInfo.FilePath;
+
+    var image = isFastImage ? (
+      <FastImage
+        style={styles.photo}
+        resizeMode={FastImage.resizeMode.cover}
+        onLoad={e => {
+          this.setState({
+            isFastImage: true,
+          });
+        }}
+        source={{
+          uri: API.downloadURL + fileName,
+        }}
+      />
+    ) : (
+      <Image
+        style={styles.photo}
+        resizeMode="cover"
+        source={{
+          uri: API.downloadURL + fileName,
+        }}
+      />
+    );
     if (Util.isVideo(groupInfo.FilePath)) {
       var fileExtention = String(groupInfo.FilePath.split(/[. ]+/).pop());
       fileName = String(groupInfo.FilePath).replace(fileExtention, 'jpg');
     }
+    console.log(API.downloadURL + fileName);
     return (
       <View style={styles.container}>
         <View style={[styles.margin, styles.shadow]}>
@@ -51,14 +79,7 @@ export default class GroupItem extends React.PureComponent {
                 />
               </View>
             ) : (
-              <View style={styles.photo_frame}>
-                <Image
-                  style={styles.photo}
-                  source={{
-                    uri: API.downloadURL + fileName,
-                  }}
-                />
-              </View>
+              <View style={styles.photo_frame}>{image}</View>
             )}
             <View style={styles.title_frame}>
               <Text
@@ -142,7 +163,6 @@ const styles = StyleSheet.create({
   },
   photo: {
     flex: 1,
-    flexDirection: 'column',
   },
   empty_frame: {
     flex: 1,

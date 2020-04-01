@@ -164,7 +164,7 @@ export default class FileList extends React.Component {
         selectImageSize += 1;
       });
       console.log(selectImageCount, selectImageSize);
-      if (selectImageSize > maxImageSize && selectImageCount > 1) {
+      if (selectImageSize > maxImageSize && selectImageCount < 1) {
         Alert.alert(
           '업로드 실패',
           '앱 성능을 위해 한번에 최대 올릴 수 있는 사진 사이즈는 15MB입니다. 현재 선택하신 사이즈는 ' +

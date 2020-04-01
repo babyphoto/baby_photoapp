@@ -103,11 +103,6 @@ const APIdefault = {
   },
   filePost: (addr, param, responsefunc, errfunc) => {
     console.log('POST : ' + APIdefault.host + addr, 'PARAM: ' + param);
-    var formData = new FormData();
-    // formData.append('files', param.files);
-    // formData.append('userNum', param.userNum);
-    // formData.append('groupNum', param.groupNum);
-
     fetch(APIdefault.host + addr, {
       method: 'POST',
       headers: {
@@ -116,7 +111,9 @@ const APIdefault = {
       },
       body: param,
     })
-      .then(response => response.json())
+      .then(response => {
+        return response.json();
+      })
       .then(responseJson => {
         console.log(responseJson);
         if (responsefunc) {

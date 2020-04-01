@@ -24,7 +24,7 @@ export default class FileItem extends React.PureComponent {
     this.state = {
       thumbnailImage: '',
       thumbnailHeight: '100%',
-      fastimage_width: 0,
+      isFastImage: false,
     };
   }
 
@@ -51,7 +51,7 @@ export default class FileItem extends React.PureComponent {
   videoError = err => {};
 
   render() {
-    const {thumbnailHeight, fastimage_width} = this.state;
+    const {thumbnailHeight, isFastImage} = this.state;
     const {fileInfo} = this.props;
     var isVideo = Util.isVideo(fileInfo.FileExtention);
     var fileName = '';
@@ -102,25 +102,28 @@ export default class FileItem extends React.PureComponent {
               </View>
             ) : (
               <View style={styles.photo_frame}>
-                <FastImage
-                  style={[styles.photo, {width: fastimage_width}]}
-                  resizeMode={FastImage.resizeMode.contain}
-                  onLoad={e => {
-                    this.setState({
-                      fastimage_width: '100%',
-                    });
-                  }}
-                  source={{
-                    uri: API.downloadURL + fileInfo.FilePath,
-                  }}
-                />
-                <Image
-                  style={styles.photo}
-                  resizeMode="contain"
-                  source={{
-                    uri: API.downloadURL + fileInfo.FilePath,
-                  }}
-                />
+                {isFastImage ? (
+                  <FastImage
+                    style={styles.photo}
+                    resizeMode={FastImage.resizeMode.cover}
+                    onLoad={e => {
+                      this.setState({
+                        isFastImage: true,
+                      });
+                    }}
+                    source={{
+                      uri: API.downloadURL + fileInfo.FilePath,
+                    }}
+                  />
+                ) : (
+                  <Image
+                    style={styles.photo}
+                    resizeMode="cover"
+                    source={{
+                      uri: API.downloadURL + fileInfo.FilePath,
+                    }}
+                  />
+                )}
               </View>
             )}
           </TouchableOpacity>
@@ -180,8 +183,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   photo: {
-    height: '100%',
-    width: '100%',
+    flex: 1,
   },
   photo_thumnail: {
     width: '100%',
