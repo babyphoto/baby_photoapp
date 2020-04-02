@@ -51,12 +51,7 @@ export default class FileList extends React.Component {
       },
     };
 
-    this.gads = new GoogleAds(
-      () => {
-        console.log('Advert ready to show.');
-      },
-      event => {},
-    );
+    this.gads = new GoogleAds(() => {}, event => {});
   }
 
   componentDidMount() {
@@ -188,7 +183,6 @@ export default class FileList extends React.Component {
       const {userInfo, param} = this.props;
       let data = new FormData();
       images.forEach((value, index) => {
-        console.log(value);
         data.append('files', {
           uri: value.path,
           type: value.mime,
@@ -209,7 +203,6 @@ export default class FileList extends React.Component {
 
   makeResizeImage = param => {
     const {userInfo} = this.props;
-    console.log(param);
     ImageEditor.cropImage(param.path, {
       offset: {x: 0, y: 0}, // crop 시작 위치
       size: {width: param.width, height: param.height},
@@ -217,7 +210,6 @@ export default class FileList extends React.Component {
       resizeMode: 'cover',
     })
       .then(value => {
-        console.log('resize', value);
         let data = new FormData();
         data.append('file', {
           uri: value,

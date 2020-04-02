@@ -28,6 +28,7 @@ import Confirm from './popup/Confirm';
 import Profile from './popup/Profile';
 import RNKakaoLogins from '@react-native-seoul/kakao-login';
 import {LoginManager} from 'react-native-fbsdk';
+import firebase from 'react-native-firebase';
 
 export default class Main extends React.Component {
   constructor(props) {
@@ -105,12 +106,9 @@ export default class Main extends React.Component {
 
   onLogout = () => {
     const {userInfo} = this.state;
-    console.log(userInfo);
     if (userInfo.UserType === 'kakao') {
       RNKakaoLogins.logout()
-        .then(result => {
-          console.log('ddd');
-        })
+        .then(result => {})
         .catch(err => {
           if (err.code === 'E_CANCELLED_OPERATION') {
             console.log(err.message);
@@ -374,6 +372,13 @@ export default class Main extends React.Component {
       );
     }
 
+    // admob
+    const Banner = firebase.admob.Banner;
+    const AdRequest = firebase.admob.AdRequest;
+    const request = new AdRequest();
+
+    const unitId = 'ca-app-pub-7452031807230982/3626491189';
+
     return (
       <SafeAreaView style={styles.container}>
         {Platform.OS === 'ios' ? (
@@ -385,6 +390,14 @@ export default class Main extends React.Component {
           <CNavigation isRight onRightButton={this.onShowProfile}>
             {userInfo.UserName} 님의 그룹
           </CNavigation>
+          <View style={styles.banner_frame}>
+            <Banner
+              unitId={unitId}
+              size={'SMART_BANNER'}
+              request={request.build()}
+              onAdLoaded={() => {}}
+            />
+          </View>
           <View style={styles.list_frame}>
             <ScrollView style={styles.scroll_frame}>
               <View style={styles.title_frame}>
@@ -401,6 +414,7 @@ export default class Main extends React.Component {
               {inviteGrid}
             </ScrollView>
           </View>
+
           <ActionButton buttonColor={Color.floatingActionButton}>
             <ActionButton.Item
               buttonColor={Color.c9b59b6}
@@ -453,4 +467,5 @@ const styles = StyleSheet.create({
     height: 22,
     color: 'white',
   },
+  banner_frame: {},
 });

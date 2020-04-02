@@ -41,7 +41,6 @@ export default class Login extends React.Component {
     AsyncStorage.getItem(Keys.login).then(value => {
       if (value === 'Y') {
         AsyncStorage.getItem(Keys.userinfo).then(value1 => {
-          console.log('relogin', value1);
           var result = JSON.parse(value1);
           this.oAuthLogin({
             platform: result.UserType,
@@ -97,13 +96,11 @@ export default class Login extends React.Component {
     if (agreement) {
       LoginManager.logInWithPermissions(['public_profile']).then(
         result => {
-          console.log(result);
           if (result.isCancelled) {
             console.log('Login cancelled');
           } else {
             AccessToken.getCurrentAccessToken().then(data => {
               //TODO login success process
-              console.log(data);
               this.getPublicProfile();
               // this.oAuthLogin('facebook', data.userID);
             });
@@ -130,7 +127,6 @@ export default class Login extends React.Component {
         if (err) {
           console.log('Error fetching data: ' + err.toString());
         } else {
-          console.log(result);
           this.oAuthLogin({
             platform: 'facebook',
             id: result.id,

@@ -14,6 +14,7 @@ import {Size} from '../common/Size';
 import * as Progress from 'react-native-progress';
 import {CFont} from '../common/CFont';
 import CButton from '../component/button/CButton';
+import firebase from 'react-native-firebase';
 
 export default class CProgress extends React.PureComponent {
   constructor(props) {
@@ -41,6 +42,13 @@ export default class CProgress extends React.PureComponent {
   render() {
     const {isVisible, data, adShowFunc} = this.props;
     var oneMb = 1048576;
+
+    const Banner = firebase.admob.Banner;
+    const AdRequest = firebase.admob.AdRequest;
+    const request = new AdRequest();
+
+    const unitId = 'ca-app-pub-7452031807230982/3626491189';
+
     return (
       <Modal
         animationType="fade"
@@ -49,6 +57,14 @@ export default class CProgress extends React.PureComponent {
         onRequestClose={this.close}>
         <TouchableWithoutFeedback onLayout={layout => {}} onPress={this.close}>
           <View transparent={true} style={styles.container}>
+            <View style={styles.banner}>
+              <Banner
+                unitId={unitId}
+                size={'SMART_BANNER'}
+                request={request.build()}
+                onAdLoaded={() => {}}
+              />
+            </View>
             <TouchableHighlight
               activeOpacity={1}
               style={[styles.popup_back, styles.shadow]}>
@@ -111,6 +127,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
   },
   touchable: {
     height: '100%',
@@ -119,7 +136,7 @@ const styles = StyleSheet.create({
   popup_back: {
     backgroundColor: Color.cffffff,
     minHeight: Size.height(120),
-    width: '90%',
+    width: '100%',
     flexDirection: 'column',
     justifyContent: 'center',
   },
@@ -177,5 +194,8 @@ const styles = StyleSheet.create({
   button: {
     height: Size.height(30),
     marginLeft: Size.width(8),
+  },
+  banner: {
+    marginBottom: Size.height(5),
   },
 });

@@ -76,7 +76,6 @@ export default class GoogleAds {
       this.state.watching = true;
       this.state.watchable = false;
       this.state.loading = false;
-      console.log('test');
       return;
     }
     this.doLoad();

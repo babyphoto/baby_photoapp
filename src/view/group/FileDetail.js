@@ -99,7 +99,6 @@ export default class FileDetail extends React.Component {
   };
 
   onChange = ({window, screen}) => {
-    console.log(window, screen);
     this.setState({
       cropHeight:
         Dimensions.get('window').height -

@@ -37,7 +37,6 @@ export default class GroupItem extends React.PureComponent {
       var fileExtention = String(groupInfo.FilePath.split(/[. ]+/).pop());
       fileName = String(groupInfo.FilePath).replace(fileExtention, 'jpg');
     }
-    console.log(API.downloadURL + fileName);
     return (
       <View style={styles.container}>
         <View style={[styles.margin, styles.shadow]}>
