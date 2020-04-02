@@ -213,7 +213,7 @@ export default class FileList extends React.Component {
     ImageEditor.cropImage(param.path, {
       offset: {x: 0, y: 0}, // crop 시작 위치
       size: {width: param.width, height: param.height},
-      displaySize: {width: 2048, height: 2048},
+      displaySize: {width: 512, height: 512},
       resizeMode: 'cover',
     })
       .then(value => {
