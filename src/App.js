@@ -21,7 +21,7 @@ import Main from './view/Main';
 import {Color} from './view/common/Color';
 import Login from './view/Login';
 import FileList from './view/group/FileList';
-import FileDetail from './view/group/FileDetail';
+import FileDetailWapper from './view/group/FileDetailWapper';
 
 export default class App extends React.Component {
   constructor(props) {
@@ -43,7 +43,7 @@ export default class App extends React.Component {
               <Scene
                 key="fileDetail"
                 title="fileDetail"
-                component={FileDetail}
+                component={FileDetailWapper}
               />
             </Stack>
             <Stack key="login_stack" initial hideNavBar>

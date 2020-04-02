@@ -1,3 +1,3 @@
 export const Strings = {
-  version: 'v1.2.5',
+  version: 'v1.3.1',
 };

@@ -30,10 +30,12 @@ export default class FileItem extends React.PureComponent {
   componentDidMount() {}
 
   onPress = () => {
-    const {fileInfo, adShowFunc} = this.props;
+    const {fileList, index, fileInfo, adShowFunc} = this.props;
     Actions.fileDetail({
       fileInfo: fileInfo,
       adShowFunc: adShowFunc,
+      fileList: fileList,
+      index: index,
     });
     // this.requestStorageAccess();
   };

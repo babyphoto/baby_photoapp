@@ -377,6 +377,8 @@ export default class FileList extends React.Component {
           renderItem={(data, i) => {
             return (
               <FileItem
+                fileList={fileList}
+                index={i}
                 fileInfo={data}
                 onPress={this.onClickGroupItem}
                 onLongPress={this.onLongPress}
