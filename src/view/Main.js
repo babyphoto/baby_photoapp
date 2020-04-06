@@ -13,6 +13,7 @@ import {
   Dimensions,
   Image,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import {Color} from './common/Color';
 import {Size} from './common/Size';
@@ -207,12 +208,20 @@ export default class Main extends React.Component {
 
   onClickGroupItem = (param, title) => {
     const {userInfo} = this.state;
-    Actions.fileList({
-      param: param,
-      title: title,
-      userInfo: userInfo,
-      callback: this.callGroupList,
-    });
+    console.log(param);
+    if (param.AbleView === 'Y' || param.IsAdmin === 'Y') {
+      Actions.fileList({
+        param: param,
+        title: title,
+        userInfo: userInfo,
+        callback: this.callGroupList,
+      });
+    } else {
+      Alert.alert(
+        '권한부족',
+        '해당 그룹의 사진을 볼 수 있는 권한이 없습니다. 그룹관리자에게 문의하세요.',
+      );
+    }
   };
 
   showDeleteGroup = param => {

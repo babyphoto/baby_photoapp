@@ -22,6 +22,13 @@ export const API = {
       err,
     );
   },
+  groupUserDetailList: (data, res, err) => {
+    APIdefault.GET(
+      '/user/groupUserDetailList?' + querySring.stringify(data),
+      res,
+      err,
+    );
+  },
   //group
   groupList: (data, res, err) => {
     APIdefault.GET('/group/groupList?' + querySring.stringify(data), res, err);
@@ -37,6 +44,9 @@ export const API = {
   },
   inviteGroup: (data, res, err) => {
     APIdefault.POST('/group/inviteGroup', querySring.stringify(data), res, err);
+  },
+  modifyGroup: (data, res, err) => {
+    APIdefault.POST('/group/modifyGroup', querySring.stringify(data), res, err);
   },
   //file
   downloadURL: 'http://112.169.11.118:38080/api/files/download?path=',

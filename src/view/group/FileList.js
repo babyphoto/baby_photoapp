@@ -8,6 +8,8 @@ import {
   BackHandler,
   Dimensions,
   Alert,
+  TouchableOpacity,
+  Image,
 } from 'react-native';
 import CNavigation from '../component/navigation/CNavigation';
 import {Color} from '../common/Color';
@@ -25,6 +27,8 @@ import InviteFriendPopup from '../popup/InviteFriendPopup';
 import Profile from '../popup/Profile';
 import CProgress from '../popup/CProgress';
 import ImageEditor from '@react-native-community/image-editor';
+import {Size} from '../common/Size';
+import GroupUserList from '../popup/GroupUserList';
 export default class FileList extends React.Component {
   constructor(props) {
     super(props);
@@ -49,6 +53,7 @@ export default class FileList extends React.Component {
         loaded: 0,
         per: 0,
       },
+      groupUserList: <View />,
     };
 
     this.gads = new GoogleAds(() => {}, event => {});
@@ -269,9 +274,11 @@ export default class FileList extends React.Component {
   };
 
   callFileList = () => {
+    const {userInfo} = this.props;
     const {param} = this.props;
     API.fileList(
       {
+        userNum: userInfo.UserNum,
         groupNum: param.GroupNum,
       },
       res => {
@@ -279,6 +286,14 @@ export default class FileList extends React.Component {
           this.setState({
             fileList: res.result.fileList,
           });
+        } else {
+          if (res === 'Viewing fail - Lack of authority') {
+            Alert.alert(
+              '권한부족',
+              '해당 그룹의 사진을 볼 수 있는 권한이 없습니다. 권한이 필요하실 경우 그룹관리자에게 문의하세요.',
+            );
+            Actions.pop();
+          }
         }
       },
     );
@@ -370,6 +385,26 @@ export default class FileList extends React.Component {
     );
   };
 
+  showGroupList = () => {
+    const {userInfo, param} = this.props;
+    this.setState({
+      groupUserList: (
+        <GroupUserList
+          isVisible={true}
+          onClose={this.closeGroupList}
+          groupInfo={param}
+          loginUserInfo={userInfo}
+        />
+      ),
+    });
+  };
+
+  closeGroupList = () => {
+    this.setState({
+      groupUserList: <View />,
+    });
+  };
+
   render() {
     const {
       fileList,
@@ -379,8 +414,9 @@ export default class FileList extends React.Component {
       profilePopup,
       isProgress,
       progressData,
+      groupUserList,
     } = this.state;
-    const {title, userInfo} = this.props;
+    const {title, userInfo, param} = this.props;
     var gridView = <View />;
     if (isGridView) {
       gridView = isGridView;
@@ -406,7 +442,7 @@ export default class FileList extends React.Component {
         />
       );
     }
-
+    console.log(param);
     return (
       <SafeAreaView style={styles.container}>
         {Platform.OS === 'ios' ? (
@@ -415,7 +451,40 @@ export default class FileList extends React.Component {
           <StatusBar barStyle="dark-content" backgroundColor={Color.cffffff} />
         )}
         <View style={styles.content_frame}>
-          <CNavigation isBack>{title}</CNavigation>
+          <CNavigation
+            isBack
+            isRightList
+            rightList={
+              <View style={styles.right_button_frame}>
+                {Util.isY(param.IsAdmin) ? (
+                  <View style={styles.button_frame}>
+                    <TouchableOpacity
+                      style={styles.touchable}
+                      onPress={this.showGroupList}>
+                      <Image
+                        style={styles.button_image}
+                        source={require('../../assets/images/people.png')}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <View />
+                )}
+
+                <View style={styles.button_frame}>
+                  <TouchableOpacity
+                    style={styles.touchable}
+                    onPress={this.callFileList}>
+                    <Image
+                      style={styles.button_image}
+                      source={require('../../assets/images/refresh.png')}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            }>
+            {title}
+          </CNavigation>
           <View style={styles.list_frame}>{gridView}</View>
           <InviteFriendPopup
             isVisible={inviteFriendPopup}
@@ -429,6 +498,8 @@ export default class FileList extends React.Component {
             data={progressData}
             adShowFunc={this.adShowFunc}
           />
+
+          {groupUserList}
         </View>
         <ActionButton buttonColor={Color.floatingActionButton}>
           <ActionButton.Item
@@ -473,5 +544,30 @@ const styles = StyleSheet.create({
   },
   scroll_frame: {
     flex: 1,
+  },
+  right_button_frame: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  button_frame: {
+    height: Size.width(29),
+    width: Size.width(29),
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: Size.width(10),
+  },
+  button_image: {
+    height: Size.width(21),
+    width: Size.width(24),
+  },
+  touchable: {
+    height: '100%',
+    width: '100%',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

@@ -44,4 +44,27 @@ export const Util = {
       diffTime.hour + '시간 ' + diffTime.minute + '분 ' + diffTime.second + '초'
     );
   },
+
+  clone: function(obj) {
+    if (obj === null || typeof obj !== 'object') {
+      return obj;
+    }
+
+    var copy = obj.constructor();
+
+    for (var attr in obj) {
+      if (obj.hasOwnProperty(attr)) {
+        copy[attr] = obj[attr];
+      }
+    }
+
+    return copy;
+  },
+  isY: function(str) {
+    if (str === 'Y') {
+      return true;
+    } else {
+      return false;
+    }
+  },
 };
