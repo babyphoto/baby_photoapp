@@ -38,6 +38,8 @@ export default class CNavigation extends React.PureComponent {
       onRightButton,
       onRightButtonImage,
       style,
+      isRightList,
+      rightList,
     } = this.props;
     var onRightImage = onRightButtonImage;
     if (!onRightButtonImage) {
@@ -73,6 +75,11 @@ export default class CNavigation extends React.PureComponent {
                 <Image style={styles.back_button_image} source={onRightImage} />
               </TouchableOpacity>
             </View>
+          ) : (
+            <View />
+          )}
+          {isRightList ? (
+            <View style={styles.bottons_frame}>{rightList}</View>
           ) : (
             <View />
           )}
@@ -136,6 +143,10 @@ const styles = StyleSheet.create({
   button_image: {
     height: Size.width(16),
     width: Size.width(19.5),
+  },
+  bottons_frame: {
+    flex: 1,
+    flexDirection: 'row',
   },
   touchable: {
     height: '100%',

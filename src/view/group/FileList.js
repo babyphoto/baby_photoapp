@@ -139,9 +139,14 @@ export default class FileList extends React.Component {
   };
 
   onAddFriend = () => {
-    this.setState({
-      inviteFriendPopup: true,
-    });
+    const {param} = this.props;
+    if (param.IsAdmin === 'Y') {
+      this.setState({
+        inviteFriendPopup: true,
+      });
+    } else {
+      Alert.alert('권한부족', '관리자만 새로운 친구를 추가할 수 있습니다.');
+    }
   };
 
   closeAddFriend = () => {
@@ -152,53 +157,61 @@ export default class FileList extends React.Component {
 
   // mediaType변경시 Vedio도 가능
   onAddFile = () => {
-    ImagePicker.openPicker({
-      multiple: true,
-      mediaType: 'photo',
-      showsSelectedCount: true,
-      maxFiles: 5,
-    }).then(images => {
-      // var selectImageSize = 0;
-      // var selectImageCount = 0;
-      // var maxImageSize = 15728640;
-      // var oneMb = 1048576;
-      // images.forEach((value, index) => {
-      //   selectImageSize += value.size;
-      //   selectImageSize += 1;
-      // });
-      // console.log(selectImageCount, selectImageSize);
-      // if (selectImageSize > maxImageSize && selectImageCount > 1) {
-      //   Alert.alert(
-      //     '업로드 실패',
-      //     '앱 성능을 위해 한번에 최대 올릴 수 있는 사진 사이즈는 15MB입니다. 현재 선택하신 사이즈는 ' +
-      //       Math.round(selectImageSize / oneMb) +
-      //       'MB입니다.',
-      //   );
-      // } else {
+    const {param} = this.props;
+    if (param.AbleUpload === 'Y') {
+      ImagePicker.openPicker({
+        multiple: true,
+        mediaType: 'photo',
+        showsSelectedCount: true,
+        maxFiles: 5,
+      }).then(images => {
+        // var selectImageSize = 0;
+        // var selectImageCount = 0;
+        // var maxImageSize = 15728640;
+        // var oneMb = 1048576;
+        // images.forEach((value, index) => {
+        //   selectImageSize += value.size;
+        //   selectImageSize += 1;
+        // });
+        // console.log(selectImageCount, selectImageSize);
+        // if (selectImageSize > maxImageSize && selectImageCount > 1) {
+        //   Alert.alert(
+        //     '업로드 실패',
+        //     '앱 성능을 위해 한번에 최대 올릴 수 있는 사진 사이즈는 15MB입니다. 현재 선택하신 사이즈는 ' +
+        //       Math.round(selectImageSize / oneMb) +
+        //       'MB입니다.',
+        //   );
+        // } else {
 
-      // }
-      this.setState({
-        isProgress: true,
-      });
-      const {userInfo, param} = this.props;
-      let data = new FormData();
-      images.forEach((value, index) => {
-        data.append('files', {
-          uri: value.path,
-          type: value.mime,
-          name: value.path.split(/[/ ]+/).pop(),
+        // }
+        this.setState({
+          isProgress: true,
         });
-        if (Util.isVideo(value.mime)) {
-          this.makeThumnailAndPushServer(value);
-        } else {
-          this.makeResizeImage(value);
-        }
+        const {userInfo, param} = this.props;
+        let data = new FormData();
+        images.forEach((value, index) => {
+          data.append('files', {
+            uri: value.path,
+            type: value.mime,
+            name: value.path.split(/[/ ]+/).pop(),
+          });
+          if (Util.isVideo(value.mime)) {
+            this.makeThumnailAndPushServer(value);
+          } else {
+            this.makeResizeImage(value);
+          }
+        });
+        data.append('userNum', userInfo.UserNum);
+        data.append('groupNum', param.GroupNum);
+        this.gads.show();
+        this.callUploadFiles(data);
       });
-      data.append('userNum', userInfo.UserNum);
-      data.append('groupNum', param.GroupNum);
-      this.gads.show();
-      this.callUploadFiles(data);
-    });
+    } else {
+      Alert.alert(
+        '권한부족',
+        '업로드할 권한이 없습니다. 권한이 필요할 경우 그룹관리자에게 문의하세요.',
+      );
+    }
   };
 
   makeResizeImage = param => {
@@ -315,17 +328,25 @@ export default class FileList extends React.Component {
   };
 
   onLongPress = fileInfo => {
-    global.confirm_show(
-      '사진삭제',
-      '선택한 사진을 삭제하시겠습니까?',
-      () => {
-        global.confirm_close();
-      },
-      () => {
-        global.confirm_close();
-        this.callDeleteFile(fileInfo);
-      },
-    );
+    const {param} = this.props;
+    if (param.AbleDelete === 'Y') {
+      global.confirm_show(
+        '사진삭제',
+        '선택한 사진을 삭제하시겠습니까?',
+        () => {
+          global.confirm_close();
+        },
+        () => {
+          global.confirm_close();
+          this.callDeleteFile(fileInfo);
+        },
+      );
+    } else {
+      Alert.alert(
+        '권한부족',
+        '삭제할 권한이 없습니다. 권한이 필요할 경우 그룹관리자에게 문의하세요.',
+      );
+    }
   };
 
   callDeleteFile = fileInfo => {

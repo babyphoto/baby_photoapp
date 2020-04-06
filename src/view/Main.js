@@ -11,6 +11,8 @@ import {
   AsyncStorage,
   ScrollView,
   Dimensions,
+  Image,
+  TouchableOpacity,
 } from 'react-native';
 import {Color} from './common/Color';
 import {Size} from './common/Size';
@@ -387,7 +389,32 @@ export default class Main extends React.Component {
           <StatusBar barStyle="dark-content" backgroundColor={Color.cffffff} />
         )}
         <View style={styles.content_frame}>
-          <CNavigation isRight onRightButton={this.onShowProfile}>
+          <CNavigation
+            isRightList
+            rightList={
+              <View style={styles.right_button_frame}>
+                <View style={styles.button_frame}>
+                  <TouchableOpacity
+                    style={styles.touchable}
+                    onPress={this.onShowProfile}>
+                    <Image
+                      style={styles.button_image}
+                      source={require('../assets/images/account.png')}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.button_frame}>
+                  <TouchableOpacity
+                    style={styles.touchable}
+                    onPress={this.callGroupList}>
+                    <Image
+                      style={styles.button_image}
+                      source={require('../assets/images/refresh.png')}
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            }>
             {userInfo.UserName} 님의 그룹
           </CNavigation>
           <View style={styles.banner_frame}>
@@ -468,4 +495,29 @@ const styles = StyleSheet.create({
     color: 'white',
   },
   banner_frame: {},
+  right_button_frame: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+  },
+  button_frame: {
+    height: Size.width(29),
+    width: Size.width(29),
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: Size.width(10),
+  },
+  button_image: {
+    height: Size.width(21),
+    width: Size.width(24),
+  },
+  touchable: {
+    height: '100%',
+    width: '100%',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
