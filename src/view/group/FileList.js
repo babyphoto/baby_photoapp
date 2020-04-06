@@ -247,6 +247,7 @@ export default class FileList extends React.Component {
         );
         data.append('userNum', userInfo.UserNum);
         data.append('fileName', fileName);
+        data.append('fileType', 'video');
         API.uploadThumnail(data, res => {
           console.log('thum', res);
         });

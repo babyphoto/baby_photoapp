@@ -40,6 +40,7 @@ export const API = {
   },
   //file
   downloadURL: 'http://112.169.11.118:38080/api/files/download?path=',
+  downloadVideoURL: 'http://112.169.11.118:38080/api/files/downloadVideo?path=',
   fileList: (data, res, err) => {
     APIdefault.GET('/files/fileList?' + querySring.stringify(data), res, err);
   },

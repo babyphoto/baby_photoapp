@@ -203,7 +203,7 @@ export default class FileDetail extends React.Component {
                 ref={videoPlayer => (this.videoPlayer = videoPlayer)}
                 resizeMode={this.state.screenType}
                 onFullScreen={this.state.isFullScreen}
-                source={{uri: API.downloadURL + fileInfo.FilePath}}
+                source={{uri: API.downloadVideoURL + fileInfo.FilePath}}
                 style={styles.video}
                 volume={10}
               />

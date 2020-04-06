@@ -8,6 +8,9 @@ import {
   Text,
   TextInput,
   Image,
+  Clipboard,
+  ToastAndroid,
+  TouchableOpacity,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import {Color} from '../common/Color';
@@ -101,9 +104,20 @@ export default class Profile extends React.PureComponent {
                   </Text>
                 </View>
                 <View style={styles.text_frame}>
-                  <Text style={[CFont.body2, {color: Color.c0a214b}]}>
-                    ID : {userInfo.UserNickName}
-                  </Text>
+                  <TouchableOpacity
+                    style={styles.text_frame}
+                    onPress={() => {
+                      Clipboard.setString(userInfo.UserNickName);
+                      ToastAndroid.show('복사되었습니다.', 2000);
+                    }}>
+                    <Text style={[CFont.body2, {color: Color.c0a214b}]}>
+                      ID : {userInfo.UserNickName}
+                    </Text>
+                    <Image
+                      source={require('../../assets/images/copy.png')}
+                      style={styles.copy_icon_frame}
+                    />
+                  </TouchableOpacity>
                 </View>
                 <View style={styles.text_frame}>
                   <Text style={[CFont.subtext2, {color: Color.c0a214b}]}>
@@ -219,11 +233,16 @@ const styles = StyleSheet.create({
   },
   text_frame: {
     height: Size.height(30),
-    flexDirection: 'column',
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: Size.width(30),
     marginRight: Size.width(30),
+  },
+  copy_icon_frame: {
+    marginLeft: Size.width(8),
+    height: Size.width(18),
+    width: Size.width(12),
   },
   button_frame: {
     height: Size.height(40),

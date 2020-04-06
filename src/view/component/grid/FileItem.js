@@ -75,7 +75,7 @@ export default class FileItem extends React.PureComponent {
             {isVideo ? (
               <View style={styles.photo_frame}>
                 <Video
-                  source={{uri: API.downloadURL + fileInfo.FilePath}}
+                  source={{uri: API.downloadVideoURL + fileInfo.FilePath}}
                   ref={ref => {
                     this.player = ref;
                   }}
