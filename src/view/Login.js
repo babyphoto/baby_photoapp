@@ -40,24 +40,54 @@ export default class Login extends React.Component {
   }
 
   componentDidMount() {
-    AsyncStorage.getItem(Keys.login).then(value => {
-      if (value === 'Y') {
-        AsyncStorage.getItem(Keys.userinfo).then(value1 => {
-          var result = JSON.parse(value1);
-          this.oAuthLogin({
-            platform: result.UserType,
-            id: result.UserCode,
-            name: result.UserName,
-            profile: result.UserProfile,
-          });
-        });
-      } else {
-        this.setState({
-          display: true,
-        });
-      }
-    });
+    this.isConnect();
   }
+
+  isConnect = () => {
+    API.connect(
+      {},
+      res => {
+        if (res) {
+          if (res === 'Connect Success') {
+            AsyncStorage.getItem(Keys.login).then(value => {
+              if (value === 'Y') {
+                AsyncStorage.getItem(Keys.userinfo).then(value1 => {
+                  var result = JSON.parse(value1);
+                  this.oAuthLogin({
+                    platform: result.UserType,
+                    id: result.UserCode,
+                    name: result.UserName,
+                    profile: result.UserProfile,
+                  });
+                });
+              } else {
+                this.setState({
+                  display: true,
+                });
+              }
+            });
+          } else {
+            Alert.alert(
+              '서버점검',
+              '현재 서버 점검이 진행중입니다. 잠시만 기달려주세요.',
+            );
+          }
+        } else {
+          Alert.alert(
+            '서버점검',
+            '현재 서버 점검이 진행중입니다. 잠시만 기달려주세요.',
+          );
+        }
+      },
+      error => {
+        console.log(error);
+        Alert.alert(
+          '서버점검',
+          '현재 서버 점검이 진행중입니다. 잠시만 기달려주세요.',
+        );
+      },
+    );
+  };
 
   clickKakaoLogin = () => {
     const {agreement} = this.state;

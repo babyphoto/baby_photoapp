@@ -100,6 +100,7 @@ export default class FileItem extends React.PureComponent {
                   resizeMode={FastImage.resizeMode.cover}
                   source={{
                     uri: API.downloadURL + fileName,
+                    cache: FastImage.cacheControl.web,
                   }}
                 />
               </View>
@@ -110,6 +111,7 @@ export default class FileItem extends React.PureComponent {
                   resizeMode={FastImage.resizeMode.cover}
                   source={{
                     uri: API.downloadURL + fileInfo.FileThumbnail,
+                    cache: FastImage.cacheControl.web,
                   }}
                 />
               </View>

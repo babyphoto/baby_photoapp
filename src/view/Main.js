@@ -120,32 +120,20 @@ export default class Main extends React.Component {
             console.log(err.message);
           }
         });
-      AsyncStorage.removeItem(Keys.userinfo)
+      AsyncStorage.clear()
         .then(() => {
-          AsyncStorage.removeItem(Keys.login)
-            .then(() => {
-              this.onCloseProfile();
-              Actions.replace('login_stack');
-            })
-            .catch(err => {
-              console.error(err);
-            });
+          this.onCloseProfile();
+          Actions.replace('login_stack');
         })
         .catch(err => {
           console.error(err);
         });
     } else {
       LoginManager.logOut();
-      AsyncStorage.removeItem(Keys.userinfo)
+      AsyncStorage.clear()
         .then(() => {
-          AsyncStorage.removeItem(Keys.login)
-            .then(() => {
-              this.onCloseProfile();
-              Actions.replace('login_stack');
-            })
-            .catch(err => {
-              console.error(err);
-            });
+          this.onCloseProfile();
+          Actions.replace('login_stack');
         })
         .catch(err => {
           console.error(err);

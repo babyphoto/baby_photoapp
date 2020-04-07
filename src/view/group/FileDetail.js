@@ -39,6 +39,7 @@ export default class FileDetail extends React.Component {
       cropHeight: Dimensions.get('window').height - Size.navigationHeight,
       cropWidth: Dimensions.get('window').width,
       navbar_height: Size.navigationHeight,
+      isThumbnail: true,
     };
   }
 
@@ -166,7 +167,7 @@ export default class FileDetail extends React.Component {
   };
 
   render() {
-    const {cropHeight, cropWidth, navbar_height} = this.state;
+    const {cropHeight, cropWidth, navbar_height, isThumbnail} = this.state;
     const {fileInfo} = this.props;
     var isVideo = Util.isVideo(fileInfo.FileExtention);
     var fileName = '';
@@ -176,7 +177,6 @@ export default class FileDetail extends React.Component {
         'jpg',
       );
     }
-
     return (
       <SafeAreaView style={styles.container}>
         {Platform.OS === 'ios' ? (
@@ -229,10 +229,35 @@ export default class FileDetail extends React.Component {
                 imageWidth={cropWidth}
                 imageHeight={cropHeight}>
                 <FastImage
-                  style={[styles.photo]}
+                  style={[styles.photo, {zIndex: isThumbnail ? 0 : 1}]}
                   resizeMode={FastImage.resizeMode.contain}
+                  onError={err => {
+                    console.log(err);
+                  }}
+                  onLoadEnd={() => {
+                    this.setState({
+                      isThumbnail: false,
+                    });
+                  }}
                   source={{
                     uri: API.downloadURL + fileInfo.FilePath,
+                    cache: FastImage.cacheControl.web,
+                  }}
+                />
+                <FastImage
+                  style={[
+                    styles.photo,
+                    {
+                      height: isThumbnail ? '100%' : 0,
+                    },
+                  ]}
+                  onError={err => {
+                    console.log(err);
+                  }}
+                  resizeMode={FastImage.resizeMode.contain}
+                  source={{
+                    uri: API.downloadURL + fileInfo.FileThumbnail,
+                    cache: FastImage.cacheControl.web,
                   }}
                 />
               </ImageZoom>
@@ -272,7 +297,11 @@ const styles = StyleSheet.create({
     backgroundColor: Color.c000000,
   },
   photo: {
-    flex: 1,
+    height: '100%',
+    width: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
   },
   video_frame: {
     flex: 1,

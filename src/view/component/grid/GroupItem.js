@@ -60,6 +60,7 @@ export default class GroupItem extends React.PureComponent {
                   resizeMode={FastImage.resizeMode.cover}
                   source={{
                     uri: API.downloadURL + fileName,
+                    cache: FastImage.cacheControl.web,
                   }}
                 />
               </View>

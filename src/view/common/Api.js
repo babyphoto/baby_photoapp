@@ -6,7 +6,7 @@ import {Actions} from 'react-native-router-flux';
 export const API = {
   //
   connect: (data, res, err) => {
-    APIdefault.GET('/api/connect', res, err);
+    APIdefault.GET('/connect', res, err);
   },
   //user
   registUser: (data, res, err) => {
@@ -53,8 +53,8 @@ export const API = {
     APIdefault.POST('/group/modifyGroup', querySring.stringify(data), res, err);
   },
   //file
-  downloadURL: 'http://112.169.11.118:38080/api/files/download?path=',
-  downloadVideoURL: 'http://112.169.11.118:38080/api/files/downloadVideo?path=',
+  downloadURL: 'http://115.68.216.94/api' + '/files/download?path=',
+  downloadVideoURL: 'http://115.68.216.94/api' + '/files/downloadVideo?path=',
   fileList: (data, res, err) => {
     APIdefault.GET('/files/fileList?' + querySring.stringify(data), res, err);
   },
