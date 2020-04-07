@@ -1,4 +1,5 @@
 import moment from 'moment';
+import {Dimensions, Platform} from 'react-native';
 
 export const Util = {
   isVideo: function(type) {
@@ -66,5 +67,17 @@ export const Util = {
     } else {
       return false;
     }
+  },
+  isIPhoneX: () => {
+    const X_WIDTH = 375;
+    const X_HEIGHT = 812;
+
+    const XSMAX_WIDTH = 414;
+    const XSMAX_HEIGHT = 896;
+    const {height, width} = Dimensions.get('window');
+    return Platform.OS === 'ios' && !Platform.isPad && !Platform.isTVOS
+      ? (width === X_WIDTH && height === X_HEIGHT) ||
+          (width === XSMAX_WIDTH && height === XSMAX_HEIGHT)
+      : false;
   },
 };

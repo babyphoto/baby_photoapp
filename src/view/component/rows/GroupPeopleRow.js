@@ -39,7 +39,6 @@ export default class GroupPeopleRow extends React.PureComponent {
 
   render() {
     const {data, loginUserInfo} = this.props;
-    console.log(data);
     var profile = data.UserProfile
       ? {uri: data.UserProfile}
       : require('../../../assets/images/account.png');

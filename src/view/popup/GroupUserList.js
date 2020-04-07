@@ -150,63 +150,71 @@ export default class GroupUserList extends React.PureComponent {
           onLayout={layout => {}}
           onPress={this.close}
           onFocus={() => console.log('dddd')}>
-          <View transparent={true} style={styles.container}>
-            <TouchableHighlight
-              activeOpacity={1}
-              style={[styles.popup_back, styles.shadow]}>
-              <View style={styles.content}>
-                <View style={styles.title_frame}>
-                  <Text style={[CFont.body2, {color: Color.navtitle}]}>
-                    그룹원 리스트
-                  </Text>
-                </View>
-                <View style={styles.input_frame}>
-                  <Image
-                    style={styles.icon}
-                    source={require('../../assets/images/search.png')}
-                  />
-                  <CTextField
-                    initText={people_text}
-                    onChangeText={this.onChangeText}
-                    style={styles.input}
-                  />
-                </View>
-                <View style={styles.divider_title_frame}>
-                  <View style={styles.divider_title}>
-                    <Text style={[CFont.subtext2, {color: Color.cffffff}]}>
-                      사용자정보
-                    </Text>
+          <View transparent={true} style={styles.back_view}>
+            <ScrollView style={styles.back_scroll}>
+              <View style={styles.container}>
+                <TouchableHighlight
+                  activeOpacity={1}
+                  style={[styles.popup_back, styles.shadow]}>
+                  <View style={styles.content}>
+                    <View style={styles.title_frame}>
+                      <Text style={[CFont.body2, {color: Color.navtitle}]}>
+                        그룹원 리스트
+                      </Text>
+                    </View>
+                    <View style={styles.input_frame}>
+                      <Image
+                        style={styles.icon}
+                        source={require('../../assets/images/search.png')}
+                      />
+                      <CTextField
+                        initText={people_text}
+                        onChangeText={this.onChangeText}
+                        style={styles.input}
+                      />
+                    </View>
+                    <View style={styles.divider_title_frame}>
+                      <View style={styles.divider_title}>
+                        <Text style={[CFont.subtext2, {color: Color.cffffff}]}>
+                          사용자정보
+                        </Text>
+                      </View>
+                      <View style={styles.divider_items}>
+                        <View style={styles.divider_item}>
+                          <Text
+                            style={[CFont.subtext2, {color: Color.cffffff}]}>
+                            업로드
+                          </Text>
+                        </View>
+                        <View style={styles.divider_item}>
+                          <Text
+                            style={[CFont.subtext2, {color: Color.cffffff}]}>
+                            삭제
+                          </Text>
+                        </View>
+                        <View style={styles.divider_item}>
+                          <Text
+                            style={[CFont.subtext2, {color: Color.cffffff}]}>
+                            보기
+                          </Text>
+                        </View>
+                        <View style={styles.divider_item}>
+                          <Text
+                            style={[CFont.subtext2, {color: Color.cffffff}]}>
+                            추방
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                    <View style={styles.list_frame}>
+                      <ScrollView style={styles.scroll_frame}>
+                        {groupList}
+                      </ScrollView>
+                    </View>
                   </View>
-                  <View style={styles.divider_items}>
-                    <View style={styles.divider_item}>
-                      <Text style={[CFont.subtext2, {color: Color.cffffff}]}>
-                        업로드
-                      </Text>
-                    </View>
-                    <View style={styles.divider_item}>
-                      <Text style={[CFont.subtext2, {color: Color.cffffff}]}>
-                        삭제
-                      </Text>
-                    </View>
-                    <View style={styles.divider_item}>
-                      <Text style={[CFont.subtext2, {color: Color.cffffff}]}>
-                        보기
-                      </Text>
-                    </View>
-                    <View style={styles.divider_item}>
-                      <Text style={[CFont.subtext2, {color: Color.cffffff}]}>
-                        추방
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-                <View style={styles.list_frame}>
-                  <ScrollView style={styles.scroll_frame}>
-                    {groupList}
-                  </ScrollView>
-                </View>
+                </TouchableHighlight>
               </View>
-            </TouchableHighlight>
+            </ScrollView>
           </View>
         </TouchableWithoutFeedback>
       </Modal>
@@ -221,9 +229,17 @@ GroupUserList.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  back_view: {
     flex: 1,
     backgroundColor: Color.modal,
+    flexDirection: 'column',
+  },
+  back_scroll: {
+    flex: 1,
+  },
+  container: {
+    height: Size.viewHeight - Size.StatusBarHeight,
+    width: Size.viewWidth,
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',

@@ -241,7 +241,7 @@ export default class FileDetail extends React.Component {
                   }}
                   source={{
                     uri: API.downloadURL + fileInfo.FilePath,
-                    cache: FastImage.cacheControl.web,
+                    // cache: FastImage.cacheControl.web,
                   }}
                 />
                 <FastImage
@@ -257,7 +257,7 @@ export default class FileDetail extends React.Component {
                   resizeMode={FastImage.resizeMode.contain}
                   source={{
                     uri: API.downloadURL + fileInfo.FileThumbnail,
-                    cache: FastImage.cacheControl.web,
+                    // cache: FastImage.cacheControl.web,
                   }}
                 />
               </ImageZoom>

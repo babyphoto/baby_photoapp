@@ -7,115 +7,206 @@ import {
   TouchableWithoutFeedback,
   Text,
   TextInput,
+  Image,
+  ScrollView,
 } from 'react-native';
 import PropTypes from 'prop-types';
 import {Color} from '../common/Color';
 import {Size} from '../common/Size';
 import {CFont} from '../common/CFont';
-import CTextField from '../component/textfleid/CTextField';
 import CButton from '../component/button/CButton';
+import CTextField from '../component/textfleid/CTextField';
 import {API} from '../common/Api';
+import InvitePeopleRow from '../component/rows/InvitePeopleRow';
 
 export default class InviteFriendPopup extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      isVisible: false,
-      friend_id: '',
+      people_text: '',
+      groupUserList: [],
+      userList: [],
     };
+  }
+
+  componentDidMount() {
+    this.callGroupList();
   }
 
   close = () => {
     const {onClose} = this.props;
-    this.setState({
-      friend_id: '',
-    });
     if (onClose) {
       onClose();
     }
   };
 
   confirm = () => {
-    const {friend_id} = this.state;
-    const {profileFunc} = this.props;
+    const {onConfirm} = this.props;
+    if (onConfirm) {
+      onConfirm();
+    }
+  };
 
-    API.userSearch(
+  onChangeText = text => {
+    this.setState({
+      people_text: text,
+    });
+    this.callSearchUser(text);
+  };
+
+  callGroupList = callback => {
+    const {groupInfo} = this.props;
+    API.groupUserDetailList(
       {
-        userNickName: friend_id,
+        groupNum: groupInfo.GroupNum,
+        searchText: '',
       },
       res => {
         if (res.result) {
-          var userInfo = res.result.userInfo;
-          if (userInfo === null) {
-            alert('존재하지 않는 ID입니다.');
-          } else {
-            if (profileFunc) {
-              this.close();
-              profileFunc(userInfo);
-            }
+          if (res.result.userList.length > 0) {
+            this.setState(
+              {
+                groupUserList: res.result.userList,
+              },
+              () => {
+                if (callback) {
+                  callback();
+                }
+              },
+            );
           }
         }
       },
     );
   };
 
-  onChangeText = text => {
-    this.setState({
-      friend_id: text,
-    });
+  callSearchUser = text => {
+    const {groupUserList} = this.state;
+    API.userSearch(
+      {
+        searchText: text,
+      },
+      res => {
+        if (res.result) {
+          var checkedList = [];
+          res.result.userInfo.forEach((value, index) => {
+            if (groupUserList.length > 0) {
+              var isExist = false;
+              groupUserList.forEach((value2, index2) => {
+                if (value.UserNum === value2.UserNum) {
+                  isExist = true;
+                }
+              });
+              if (isExist) {
+                value.isInvite = true;
+                checkedList.push(value);
+              } else {
+                value.isInvite = false;
+                checkedList.push(value);
+              }
+            } else {
+              value.isInvite = false;
+              checkedList.push(value);
+            }
+          });
+          this.setState({
+            userList: checkedList,
+          });
+        }
+      },
+    );
+  };
+
+  callInvite = param => {
+    const {addInvite} = this.props;
+    const {people_text} = this.state;
+    if (addInvite) {
+      addInvite(param, () => {
+        this.callGroupList(() => {
+          this.callSearchUser(people_text);
+        });
+      });
+    }
   };
 
   render() {
-    const {friend_id} = this.state;
-    const {isVisible} = this.props;
+    const {isVisible, loginUserInfo, context} = this.props;
+    const {people_text, userList} = this.state;
+    var groupList = userList.map((value, index) => {
+      return loginUserInfo.UserNum !== value.UserNum ? (
+        <InvitePeopleRow
+          data={value}
+          id={'InvitePeopleRow' + index}
+          loginUserInfo={loginUserInfo}
+          callInvite={this.callInvite}
+        />
+      ) : (
+        <View />
+      );
+    });
     return (
       <Modal
         animationType="fade"
         transparent={true}
         visible={isVisible}
         onRequestClose={this.close}>
-        <TouchableWithoutFeedback onLayout={layout => {}} onPress={this.close}>
-          <View transparent={true} style={styles.container}>
-            <TouchableHighlight
-              activeOpacity={1}
-              style={[styles.popup_back, styles.shadow]}>
-              <View style={styles.content}>
-                <View style={styles.title_frame}>
-                  <Text style={[CFont.body2, {color: Color.navtitle}]}>
-                    친구추가
-                  </Text>
-                </View>
-                <View style={styles.input_info_frame}>
-                  <Text style={[CFont.subtext2, {color: Color.c770bbf}]}>
-                    {
-                      '친구의 아이디를 입력해주세요!\n아이디는 프로필에서 확인하실수 있습니다.'
-                    }
-                  </Text>
-                </View>
-                <View style={styles.input_frame}>
-                  <CTextField
-                    initText={friend_id}
-                    onChangeText={this.onChangeText}
-                  />
-                </View>
-                <View style={styles.button_frame}>
-                  <CButton style={styles.button} onPress={this.close}>
-                    <View style={styles.button_back}>
-                      <Text style={[CFont.body2, {color: Color.cf24444}]}>
-                        취소
+        <TouchableWithoutFeedback
+          onLayout={layout => {}}
+          onPress={this.close}
+          onFocus={() => console.log('dddd')}>
+          <View transparent={true} style={styles.back_view}>
+            <ScrollView style={styles.back_scroll}>
+              <View style={styles.container}>
+                <TouchableHighlight
+                  activeOpacity={1}
+                  style={[styles.popup_back, styles.shadow]}>
+                  <View style={styles.content}>
+                    <View style={styles.title_frame}>
+                      <Text style={[CFont.body2, {color: Color.navtitle}]}>
+                        그룹원 리스트
                       </Text>
                     </View>
-                  </CButton>
-                  <CButton style={styles.button} onPress={this.confirm}>
-                    <View style={styles.button_back}>
-                      <Text style={[CFont.body2, {color: Color.c0a214b}]}>
-                        확인
-                      </Text>
+                    <View style={styles.input_frame}>
+                      <Image
+                        style={styles.icon}
+                        source={require('../../assets/images/search.png')}
+                      />
+                      <CTextField
+                        initText={people_text}
+                        onChangeText={this.onChangeText}
+                        style={styles.input}
+                      />
                     </View>
-                  </CButton>
-                </View>
+                    <View style={styles.divider_title_frame}>
+                      <View style={styles.divider_title}>
+                        <Text style={[CFont.subtext2, {color: Color.cffffff}]}>
+                          사용자정보
+                        </Text>
+                      </View>
+                      <View style={styles.divider_items}>
+                        <View style={styles.divider_item}>
+                          <Text
+                            style={[CFont.subtext2, {color: Color.cffffff}]}>
+                            ID
+                          </Text>
+                        </View>
+                        <View style={styles.divider_item}>
+                          <Text
+                            style={[CFont.subtext2, {color: Color.cffffff}]}>
+                            초대
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                    <View style={styles.list_frame}>
+                      <ScrollView style={styles.scroll_frame}>
+                        {groupList}
+                      </ScrollView>
+                    </View>
+                  </View>
+                </TouchableHighlight>
               </View>
-            </TouchableHighlight>
+            </ScrollView>
           </View>
         </TouchableWithoutFeedback>
       </Modal>
@@ -130,9 +221,17 @@ InviteFriendPopup.propTypes = {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  back_view: {
     flex: 1,
     backgroundColor: Color.modal,
+    flexDirection: 'column',
+  },
+  back_scroll: {
+    flex: 1,
+  },
+  container: {
+    height: Size.viewHeight - Size.StatusBarHeight,
+    width: Size.viewWidth,
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
@@ -143,9 +242,31 @@ const styles = StyleSheet.create({
   },
   popup_back: {
     backgroundColor: Color.cffffff,
-    minHeight: Size.height(160),
+    minHeight: Size.height(500),
     width: '90%',
     flexDirection: 'column',
+  },
+  title_frame: {
+    marginRight: Size.width(12),
+    marginLeft: Size.width(12),
+    height: Size.height(40),
+    flexDirection: 'column',
+    justifyContent: 'center',
+  },
+  input_frame: {
+    marginRight: Size.width(12),
+    marginLeft: Size.width(12),
+    height: Size.height(50),
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  input: {
+    height: Size.height(40),
+    flex: 1,
+  },
+  icon: {
+    height: Size.width(35),
+    width: Size.width(35),
   },
   shadow: {
     shadowColor: Color.shadows,
@@ -158,46 +279,40 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   content: {
+    flex: 1,
     flexDirection: 'column',
     justifyContent: 'center',
   },
-  title_frame: {
-    marginRight: Size.width(24),
-    marginLeft: Size.width(24),
-    height: Size.height(60),
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  input_frame: {
-    marginRight: Size.width(24),
-    marginLeft: Size.width(24),
-    height: Size.height(50),
-  },
-  input_info_frame: {
-    marginRight: Size.width(24),
-    marginLeft: Size.width(24),
-    height: Size.height(50),
-    flexDirection: 'column',
-    justifyContent: 'center',
-  },
-  button_frame: {
-    height: Size.height(52),
+  divider_title_frame: {
+    height: Size.height(30),
+    backgroundColor: Color.c30d9c8,
+    paddingLeft: Size.width(10),
+    paddingRight: Size.width(10),
     flexDirection: 'row',
-    marginRight: Size.width(11),
-    marginLeft: Size.width(11),
-    alignItems: 'center',
-    justifyContent: 'flex-end',
+    marginTop: Size.height(10),
+    marginBottom: Size.height(1),
   },
-  button_back: {
-    height: '100%',
-    width: '100%',
+  divider_title: {
+    width: Size.width(120),
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  button: {
-    height: Size.height(36),
-    width: Size.width(74),
-    marginLeft: Size.width(8),
+  divider_items: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  divider_item: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  list_frame: {
+    flex: 1,
+    flexDirection: 'column',
+  },
+  scroll_frame: {
+    flex: 1,
   },
 });

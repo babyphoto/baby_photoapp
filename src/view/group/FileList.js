@@ -45,7 +45,7 @@ export default class FileList extends React.Component {
           : 4,
       isGridView: null,
       visible: false,
-      inviteFriendPopup: false,
+      inviteFriendPopup: <View />,
       profilePopup: <View />,
       isProgress: false,
       progressData: {
@@ -95,22 +95,7 @@ export default class FileList extends React.Component {
     return true;
   };
 
-  showProfile = userInfo => {
-    const {param} = this.props;
-    this.setState({
-      profilePopup: (
-        <Profile
-          onClose={this.closeProfile}
-          userInfo={userInfo}
-          groupInfo={param}
-          buttonCallback={this.callAddInvite}
-          isInvite
-        />
-      ),
-    });
-  };
-
-  callAddInvite = inviteUserInfo => {
+  callAddInvite = (inviteUserInfo, callback) => {
     const {param, userInfo} = this.props;
 
     API.inviteGroup(
@@ -122,8 +107,10 @@ export default class FileList extends React.Component {
       res => {
         if (res) {
           if (res === 'Invite Success') {
-            this.closeProfile();
             Alert.alert('친구초대', '초대되었습니다.');
+            if (callback) {
+              callback();
+            }
           } else if (res === 'Invite fail - Lack of authority') {
             Alert.alert('친구초대 실패', '초대할 수 있는 권한이 없습니다.');
           } else {
@@ -143,23 +130,6 @@ export default class FileList extends React.Component {
     });
   };
 
-  onAddFriend = () => {
-    const {param} = this.props;
-    if (param.IsAdmin === 'Y') {
-      this.setState({
-        inviteFriendPopup: true,
-      });
-    } else {
-      Alert.alert('권한부족', '관리자만 새로운 친구를 추가할 수 있습니다.');
-    }
-  };
-
-  closeAddFriend = () => {
-    this.setState({
-      inviteFriendPopup: false,
-    });
-  };
-
   // mediaType변경시 Vedio도 가능
   onAddFile = () => {
     const {param} = this.props;
@@ -168,48 +138,43 @@ export default class FileList extends React.Component {
         multiple: true,
         mediaType: 'photo',
         showsSelectedCount: true,
-        maxFiles: 5,
+        maxFiles: 30,
       }).then(images => {
         // var selectImageSize = 0;
-        // var selectImageCount = 0;
         // var maxImageSize = 15728640;
         // var oneMb = 1048576;
-        // images.forEach((value, index) => {
-        //   selectImageSize += value.size;
-        //   selectImageSize += 1;
-        // });
-        // console.log(selectImageCount, selectImageSize);
-        // if (selectImageSize > maxImageSize && selectImageCount > 1) {
-        //   Alert.alert(
-        //     '업로드 실패',
-        //     '앱 성능을 위해 한번에 최대 올릴 수 있는 사진 사이즈는 15MB입니다. 현재 선택하신 사이즈는 ' +
-        //       Math.round(selectImageSize / oneMb) +
-        //       'MB입니다.',
-        //   );
-        // } else {
-
-        // }
-        this.setState({
-          isProgress: true,
-        });
-        const {userInfo, param} = this.props;
-        let data = new FormData();
+        var selectImageCount = 0;
         images.forEach((value, index) => {
-          data.append('files', {
-            uri: value.path,
-            type: value.mime,
-            name: value.path.split(/[/ ]+/).pop(),
-          });
-          if (Util.isVideo(value.mime)) {
-            this.makeThumnailAndPushServer(value);
-          } else {
-            this.makeResizeImage(value);
-          }
+          selectImageCount += 1;
         });
-        data.append('userNum', userInfo.UserNum);
-        data.append('groupNum', param.GroupNum);
-        this.gads.show();
-        this.callUploadFiles(data);
+        if (selectImageCount > 30) {
+          Alert.alert(
+            '업로드 실패',
+            '한번에 최대 올릴 수 있는 사진의 갯수는 30장입니다.',
+          );
+        } else {
+          this.setState({
+            isProgress: true,
+          });
+          const {userInfo, param} = this.props;
+          let data = new FormData();
+          images.forEach((value, index) => {
+            data.append('files', {
+              uri: value.path,
+              type: value.mime,
+              name: value.path.split(/[/ ]+/).pop(),
+            });
+            if (Util.isVideo(value.mime)) {
+              this.makeThumnailAndPushServer(value);
+            } else {
+              this.makeResizeImage(value);
+            }
+          });
+          data.append('userNum', userInfo.UserNum);
+          data.append('groupNum', param.GroupNum);
+          this.gads.show();
+          this.callUploadFiles(data);
+        }
       });
     } else {
       Alert.alert(
@@ -221,10 +186,10 @@ export default class FileList extends React.Component {
 
   makeResizeImage = param => {
     const {userInfo} = this.props;
-    ImageEditor.cropImage(param.path, {
+    var text = ImageEditor.cropImage(param.path, {
       offset: {x: 0, y: 0}, // crop 시작 위치
       size: {width: param.width, height: param.height},
-      displaySize: {width: 512, height: 512},
+      displaySize: {width: param.width * 0.3, height: param.height * 0.3},
       resizeMode: 'cover',
     })
       .then(value => {
@@ -243,6 +208,7 @@ export default class FileList extends React.Component {
       .catch(err => {
         console.log(err);
       });
+    console.log('resize', text);
   };
 
   makeThumnailAndPushServer = param => {
@@ -405,6 +371,31 @@ export default class FileList extends React.Component {
     });
   };
 
+  showFriendSearch = () => {
+    const {userInfo, param} = this.props;
+    if (param.IsAdmin === 'Y') {
+      this.setState({
+        inviteFriendPopup: (
+          <InviteFriendPopup
+            isVisible={true}
+            onClose={this.closeFriendSearch}
+            loginUserInfo={userInfo}
+            groupInfo={param}
+            addInvite={this.callAddInvite}
+          />
+        ),
+      });
+    } else {
+      Alert.alert('권한부족', '관리자만 새로운 친구를 추가할 수 있습니다.');
+    }
+  };
+
+  closeFriendSearch = () => {
+    this.setState({
+      inviteFriendPopup: <View />,
+    });
+  };
+
   render() {
     const {
       fileList,
@@ -486,19 +477,14 @@ export default class FileList extends React.Component {
             {title}
           </CNavigation>
           <View style={styles.list_frame}>{gridView}</View>
-          <InviteFriendPopup
-            isVisible={inviteFriendPopup}
-            onClose={this.closeAddFriend}
-            userInfo={userInfo}
-            profileFunc={this.showProfile}
-          />
+
           {profilePopup}
           <CProgress
             isVisible={isProgress}
             data={progressData}
             adShowFunc={this.adShowFunc}
           />
-
+          {inviteFriendPopup}
           {groupUserList}
         </View>
         <ActionButton buttonColor={Color.floatingActionButton}>
@@ -507,7 +493,7 @@ export default class FileList extends React.Component {
             textContainerStyle={{backgroundColor: Color.c000000}}
             textStyle={{color: Color.cffffff}}
             title="친구 추가"
-            onPress={this.onAddFriend}>
+            onPress={this.showFriendSearch}>
             <Icon name="md-people" style={styles.actionButtonIcon} />
           </ActionButton.Item>
           <ActionButton.Item

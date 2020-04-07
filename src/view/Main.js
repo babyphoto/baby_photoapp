@@ -196,7 +196,6 @@ export default class Main extends React.Component {
 
   onClickGroupItem = (param, title) => {
     const {userInfo} = this.state;
-    console.log(param);
     if (param.AbleView === 'Y' || param.IsAdmin === 'Y') {
       Actions.fileList({
         param: param,

@@ -32,12 +32,10 @@ export default class GroupItem extends React.PureComponent {
     const {groupInfo} = this.props;
     var isEmptyFile = groupInfo.GroupFileCount === 0;
     var fileName = groupInfo.FilePath;
-    console.log(groupInfo);
     if (Util.isVideo(groupInfo.FilePath)) {
       var fileExtention = String(groupInfo.FilePath.split(/[. ]+/).pop());
       fileName = String(groupInfo.FilePath).replace(fileExtention, 'jpg');
     }
-    console.log(fileName);
     return (
       <View style={styles.container}>
         <View style={[styles.margin, styles.shadow]}>
@@ -60,7 +58,7 @@ export default class GroupItem extends React.PureComponent {
                   resizeMode={FastImage.resizeMode.cover}
                   source={{
                     uri: API.downloadURL + fileName,
-                    cache: FastImage.cacheControl.web,
+                    // cache: FastImage.cacheControl.web,
                   }}
                 />
               </View>
