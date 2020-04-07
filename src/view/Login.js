@@ -37,7 +37,9 @@ export default class Login extends React.Component {
       agreement: false,
       display: false,
     };
+  }
 
+  componentDidMount() {
     AsyncStorage.getItem(Keys.login).then(value => {
       if (value === 'Y') {
         AsyncStorage.getItem(Keys.userinfo).then(value1 => {
@@ -262,7 +264,19 @@ export default class Login extends React.Component {
             </View>
           </View>
         ) : (
-          <View />
+          <View style={styles.content_frame}>
+            <View style={styles.logo_frame}>
+              <Image
+                style={styles.logo}
+                source={require('../assets/images/logo.png')}
+              />
+            </View>
+            <View style={styles.logo_text_frame}>
+              <Text style={[CFont.logo, {color: Color.c0a214b}]}>
+                Baby Photo
+              </Text>
+            </View>
+          </View>
         )}
       </SafeAreaView>
     );

@@ -4,6 +4,10 @@ import {Keys} from './Keys';
 import {Actions} from 'react-native-router-flux';
 
 export const API = {
+  //
+  connect: (data, res, err) => {
+    APIdefault.GET('/api/connect', res, err);
+  },
   //user
   registUser: (data, res, err) => {
     APIdefault.POST('/user/regist', querySring.stringify(data), res, err);
@@ -73,7 +77,7 @@ export const API = {
   },
 };
 const APIdefault = {
-  host: 'http://112.169.11.118:38080/api',
+  host: 'http://115.68.216.94/api',
   GET: (addr, responsefunc, errfunc) => {
     console.log('GET : ' + APIdefault.host + addr);
     fetch(APIdefault.host + addr, {
