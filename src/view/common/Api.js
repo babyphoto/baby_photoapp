@@ -6,20 +6,26 @@ import {Actions} from 'react-native-router-flux';
 export const API = {
   //
   connect: (data, res, err) => {
-    APIdefault.GET('/connect', res, err);
+    APIdefault.GET('/connect', res, err, false);
   },
   //user
   registUser: (data, res, err) => {
     APIdefault.POST('/user/regist', querySring.stringify(data), res, err);
   },
-  userSearch: (data, res, err) => {
-    APIdefault.GET('/user/userSearch?' + querySring.stringify(data), res, err);
+  userSearch: (data, res, err, isProgress) => {
+    APIdefault.GET(
+      '/user/userSearch?' + querySring.stringify(data),
+      res,
+      err,
+      isProgress,
+    );
   },
   groupUserList: (data, res, err) => {
     APIdefault.GET(
       '/user/groupUserList?' + querySring.stringify(data),
       res,
       err,
+      true,
     );
   },
   groupUserDetailList: (data, res, err) => {
@@ -27,11 +33,17 @@ export const API = {
       '/user/groupUserDetailList?' + querySring.stringify(data),
       res,
       err,
+      true,
     );
   },
   //group
   groupList: (data, res, err) => {
-    APIdefault.GET('/group/groupList?' + querySring.stringify(data), res, err);
+    APIdefault.GET(
+      '/group/groupList?' + querySring.stringify(data),
+      res,
+      err,
+      true,
+    );
   },
   createGroup: (data, res, err) => {
     APIdefault.POST('/group/createGroup', querySring.stringify(data), res, err);
@@ -56,7 +68,12 @@ export const API = {
   //   'http://112.169.11.118:38080/api' + '/files/downloadVideo?path=',
 
   fileList: (data, res, err) => {
-    APIdefault.GET('/files/fileList?' + querySring.stringify(data), res, err);
+    APIdefault.GET(
+      '/files/fileList?' + querySring.stringify(data),
+      res,
+      err,
+      true,
+    );
   },
   uploadFiles: (data, res, err) => {
     APIdefault.filePost('/files/upload', data, res, err);
@@ -65,7 +82,13 @@ export const API = {
     APIdefault.filePost('/files/thumnail', data, res, err);
   },
   downloadFile: (data, res, err) => {
-    APIdefault.GET('/files/download', querySring.stringify(data), res, err);
+    APIdefault.GET(
+      '/files/download',
+      querySring.stringify(data),
+      res,
+      err,
+      true,
+    );
   },
   deleteFile: (data, res, err) => {
     APIdefault.POST('/files/delete', querySring.stringify(data), res, err);
@@ -79,20 +102,39 @@ export const API = {
 const APIdefault = {
   // host: 'http://112.169.11.118:38080/api',
   host: 'http://115.68.216.94/api',
-  GET: (addr, responsefunc, errfunc) => {
+  GET: (addr, responsefunc, errfunc, isProgress) => {
     console.log('GET : ' + APIdefault.host + addr);
+    if (!isProgress) {
+    } else {
+      if (global.progress_show) {
+        global.progress_show();
+      }
+    }
     fetch(APIdefault.host + addr, {
       method: 'GET',
     })
       .then(response => response.json())
       .then(responseJson => {
         console.log(responseJson);
+        if (!isProgress) {
+        } else {
+          if (global.progress_close) {
+            global.progress_close();
+          }
+        }
         if (responsefunc) {
           responsefunc(responseJson);
         }
       })
       .catch(error => {
         console.error(error);
+        if (!isProgress) {
+        } else {
+          if (global.progress_close) {
+            global.progress_close();
+          }
+        }
+
         if (errfunc) {
           errfunc(error);
         }
@@ -100,6 +142,9 @@ const APIdefault = {
   },
   POST: (addr, param, responsefunc, errfunc) => {
     console.log('POST : ' + APIdefault.host + addr, 'PARAM: ' + param);
+    if (global.progress_show) {
+      global.progress_show();
+    }
     fetch(APIdefault.host + addr, {
       method: 'POST',
       headers: {
@@ -111,12 +156,18 @@ const APIdefault = {
       .then(response => response.json())
       .then(responseJson => {
         console.log(responseJson);
+        if (global.progress_close) {
+          global.progress_close();
+        }
         if (responsefunc) {
           responsefunc(responseJson);
         }
       })
       .catch(error => {
         console.error(error);
+        if (global.progress_close) {
+          global.progress_close();
+        }
         if (errfunc) {
           errfunc(error);
         }

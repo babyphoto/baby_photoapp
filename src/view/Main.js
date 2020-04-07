@@ -32,6 +32,7 @@ import Profile from './popup/Profile';
 import RNKakaoLogins from '@react-native-seoul/kakao-login';
 import {LoginManager} from 'react-native-fbsdk';
 import firebase from 'react-native-firebase';
+import Loading from './popup/Loading';
 
 export default class Main extends React.Component {
   constructor(props) {
@@ -51,9 +52,12 @@ export default class Main extends React.Component {
       confirmPopup: <View />,
       profilePopup: <View />,
       selectedGroup: {},
+      isLoading: false,
     };
     global.confirm_show = this.onShowConfirm;
     global.confirm_close = this.onCloseConfirm;
+    global.progress_show = this.showProgress;
+    global.progress_close = this.closeProgress;
   }
 
   componentDidMount() {
@@ -143,6 +147,7 @@ export default class Main extends React.Component {
 
   callGroupList = () => {
     const {userInfo} = this.state;
+
     API.groupList(
       {
         userNum: userInfo.UserNum,
@@ -310,6 +315,18 @@ export default class Main extends React.Component {
     });
   };
 
+  showProgress = () => {
+    this.setState({
+      isLoading: true,
+    });
+  };
+
+  closeProgress = () => {
+    this.setState({
+      isLoading: false,
+    });
+  };
+
   render() {
     const {
       createGroupPopup,
@@ -321,6 +338,7 @@ export default class Main extends React.Component {
       col,
       confirmPopup,
       profilePopup,
+      isLoading,
     } = this.state;
 
     var myGrid = <View />;
@@ -452,6 +470,7 @@ export default class Main extends React.Component {
             userInfo={userInfo}
             callback={this.callGroupList}
           />
+          <Loading isVisible={isLoading} />
           {confirmPopup}
           {profilePopup}
         </View>

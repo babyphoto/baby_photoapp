@@ -114,6 +114,10 @@ export default class InviteFriendPopup extends React.PureComponent {
           });
         }
       },
+      error => {
+        console.log(error);
+      },
+      false,
     );
   };
 

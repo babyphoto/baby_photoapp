@@ -19,7 +19,7 @@ export const Color = {
   nav_shadow: 'rgba(0,0,0,0.1)',
   datetime: 'rgba(0,0,0,0.3)',
   event_card: 'rgba(119,11,191,0.3)',
-  modal: 'rgba(0,0,0,0.3)',
+  modal: 'rgba(0,0,0,0.1)',
   tranparent: 'rgba(0,0,0,0.0)',
   navtitle: 'rgba(0,0,0,0.87)',
   floatingActionButton: 'rgba(231,76,60,1)',
