@@ -16,7 +16,7 @@
     "@react-native-seoul/kakao-login": "2.4.1",
     "@valdio/react-native-scrollable-tabview": "0.8.12",
     "lodash": "4.17.15",
-    "moment": "2.24.0",
+    "moment": "2.29.2",
     "query-string": "6.11.0",
     "react": "16.9.0",
     "react-native": "0.61.5",
